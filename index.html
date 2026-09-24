@@ -190,17 +190,6 @@ h1 {
   display: none;
 }
 
-@media (max-width:640px) {
-  .control-row {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .epw-upload {
-    align-self: flex-end;
-  }
-}
-
 .shade-view-btn,
 .tab,
 .wind-filter-btn,
@@ -429,13 +418,6 @@ canvas {
   display: flex;
   flex-direction: column;
   gap: var(--sp-2);
-}
-
-@media (max-width:640px) {
-  .devices-row,
-  .fins-cols {
-    grid-template-columns: 1fr;
-  }
 }
 
 .colorbar-track {
@@ -1243,48 +1225,6 @@ input[type=color].style-color::-moz-color-swatch {
   border-color: var(--ink-dim);
 }
 
-@media (max-width:760px) {
-  .board {
-    grid-template-columns: 1fr;
-    padding: var(--sp-3);
-  }
-
-  .canvas-col {
-    height: auto!important;
-  }
-
-  canvas {
-    width: 100%;
-    height: auto;
-    object-fit: unset;
-  }
-
-  .side {
-    flex-direction: column;
-    flex-wrap: nowrap;
-  }
-
-  .board-shade-outer .side {
-    flex-direction: column;
-  }
-
-  .legend-block {
-    flex-direction: row;
-    flex-wrap: wrap;
-    gap: var(--sp-4);
-    align-items: flex-start;
-  }
-
-  .legend-block .colorbar-row {
-    flex: 0 0 auto;
-  }
-
-  .legend-block .months-list {
-    flex: 1 1 140px;
-    min-width: 140px;
-  }
-}
-
 #wsViewport {
   position: relative;
   width: 100%;
@@ -1432,20 +1372,6 @@ input[type=color].style-color::-moz-color-swatch {
   -webkit-tap-highlight-color: transparent;
 }
 
-@media (hover:hover) and (pointer:fine) {
-  .home-window:hover {
-    border-color: var(--accent-warm);
-    transform: translateY(-2px);
-    background: rgba(255,255,255,.04);
-  }
-
-  .home-window[aria-disabled=true]:hover {
-    border-color: var(--line);
-    transform: none;
-    background: rgba(255,255,255,.02);
-  }
-}
-
 .home-window-icon {
   width: 30px;
   height: 30px;
@@ -1522,12 +1448,6 @@ input[type=color].style-color::-moz-color-swatch {
   border-bottom: 1px solid rgba(240,168,104,.35);
 }
 
-@media (hover:hover) and (pointer:fine) {
-  .home-about-text a:hover {
-    border-bottom-color: var(--accent-warm);
-  }
-}
-
 .home-about-row {
   display: flex;
   align-items: stretch;
@@ -1555,17 +1475,6 @@ input[type=color].style-color::-moz-color-swatch {
   object-fit: cover;
 }
 
-@media (max-width:760px) {
-  .home-about-row {
-    flex-direction: column;
-  }
-
-  .home-about-photo {
-    flex: 0 0 auto;
-    height: 220px;
-  }
-}
-
 .home-about-thanks {
   margin-top: var(--sp-4);
   padding-top: var(--sp-4);
@@ -1584,12 +1493,6 @@ input[type=color].style-color::-moz-color-swatch {
   align-items: center;
   gap: var(--sp-1);
   border-bottom: 1px solid rgba(240,168,104,.35);
-}
-
-@media (hover:hover) and (pointer:fine) {
-  .home-about-thanks-btn:hover {
-    border-bottom-color: var(--accent-warm);
-  }
 }
 
 .account-overlay {
@@ -1668,12 +1571,6 @@ input[type=color].style-color::-moz-color-swatch {
   column-gap: var(--sp-5);
 }
 
-@media (max-width:480px) {
-  .thanks-names {
-    columns: 1;
-  }
-}
-
 .thanks-names li {
   font-size: var(--fs-3);
   color: var(--ink-dim);
@@ -1706,12 +1603,6 @@ input[type=color].style-color::-moz-color-swatch {
 .account-panel-close svg {
   width: 14px;
   height: 14px;
-}
-
-@media (max-width:480px) {
-  :root {
-    --fs-6: 26px;
-  }
 }
 
 .ws-edge-nav {
@@ -1779,20 +1670,6 @@ input[type=color].style-color::-moz-color-swatch {
 .cad-edge-nav:disabled,
 .cad-edge-nav:disabled:hover {
   background: var(--panel);
-}
-
-@media (max-width:640px) {
-  .ws-edge-nav {
-    padding: var(--sp-5) var(--sp-1);
-  }
-
-  .ws-edge-nav-embedded.ws-edge-nav-left {
-    left: var(--sp-2);
-  }
-
-  .ws-edge-nav-embedded.ws-edge-nav-right {
-    right: var(--sp-2);
-  }
 }
 
 .cad-layers-overlay {
@@ -1975,13 +1852,6 @@ input[type=color].style-color::-moz-color-swatch {
   color: var(--ink);
 }
 
-@media (max-width:640px) {
-  .cad-control-row {
-    flex-direction: column;
-    align-items: stretch;
-  }
-}
-
 .cad-head {
   display: flex;
   justify-content: space-between;
@@ -1992,12 +1862,6 @@ input[type=color].style-color::-moz-color-swatch {
 
 .cad-head .ws-toggle-btn {
   flex: 0 0 auto;
-}
-
-@media (max-width:640px) {
-  .cad-head {
-    flex-direction: column;
-  }
 }
 
 .cad-board {
@@ -2122,16 +1986,6 @@ input[type=color].style-color::-moz-color-swatch {
   color: var(--ink-dim);
   text-transform: none;
   letter-spacing: normal;
-}
-
-@media (max-width:980px) {
-  .cad-tool-settings {
-    margin-left: 0;
-    padding-left: 0;
-    flex-basis: 100%;
-    padding-top: var(--sp-2);
-    border-top: 1px solid var(--line);
-  }
 }
 
 .cad-canvas-wrap {
@@ -2487,27 +2341,6 @@ input[type=color].style-color::-moz-color-swatch {
   text-align: center;
 }
 
-@media (max-width:760px) {
-  .cad-board {
-    height: auto;
-  }
-
-  .cad-canvas-wrap {
-    height: auto;
-    min-height: 340px;
-  }
-
-  .cad-cartasolar-wrap,
-  .cad-wind-settings-wrap {
-    position: static;
-  }
-
-  .cad-widget-drop {
-    left: auto;
-    right: 0;
-  }
-}
-
 .cad-wind-wrap {
   position: relative;
   display: flex;
@@ -2740,17 +2573,6 @@ input[type=color].style-color::-moz-color-swatch {
   border: 1px solid var(--line);
   border-radius: var(--r-3);
   cursor: default;
-}
-
-@media (max-width:900px) {
-  .shade-canvas-col {
-    grid-template-columns: 1fr;
-  }
-
-  .shade-diagram canvas {
-    height: min(24vh,300px);
-    min-height: 220px;
-  }
 }
 
 .wind-board {
@@ -4115,6 +3937,287 @@ input[type=color].style-color::-moz-color-swatch {
 #windBoard .wind-rose-head {
   top: var(--sp-2);
   right: var(--sp-2);
+}
+
+/* ============================================================
+   RESPONSIVE · CELULARES Y PANTALLAS ANGOSTAS
+   (todos los @media del archivo, agrupados aquí; el orden
+   original entre ellos se conserva para no alterar la cascada)
+   ============================================================ */
+
+
+
+@media (max-width:640px) {
+  .control-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .epw-upload {
+    align-self: flex-end;
+  }
+}
+
+@media (max-width:640px) {
+  .devices-row,
+  .fins-cols {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width:760px) {
+  .board {
+    grid-template-columns: 1fr;
+    padding: var(--sp-3);
+  }
+
+  .canvas-col {
+    height: auto!important;
+  }
+
+  canvas {
+    width: 100%;
+    height: auto;
+    object-fit: unset;
+  }
+
+  .side {
+    flex-direction: column;
+    flex-wrap: nowrap;
+  }
+
+  .board-shade-outer .side {
+    flex-direction: column;
+  }
+
+  .legend-block {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: var(--sp-4);
+    align-items: flex-start;
+  }
+
+  .legend-block .colorbar-row {
+    flex: 0 0 auto;
+  }
+
+  .legend-block .months-list {
+    flex: 1 1 140px;
+    min-width: 140px;
+  }
+}
+
+@media (hover:hover) and (pointer:fine) {
+  .home-window:hover {
+    border-color: var(--accent-warm);
+    transform: translateY(-2px);
+    background: rgba(255,255,255,.04);
+  }
+
+  .home-window[aria-disabled=true]:hover {
+    border-color: var(--line);
+    transform: none;
+    background: rgba(255,255,255,.02);
+  }
+}
+
+@media (hover:hover) and (pointer:fine) {
+  .home-about-text a:hover {
+    border-bottom-color: var(--accent-warm);
+  }
+}
+
+@media (max-width:760px) {
+  .home-about-row {
+    flex-direction: column;
+  }
+
+  .home-about-photo {
+    flex: 0 0 auto;
+    height: 220px;
+  }
+}
+
+@media (hover:hover) and (pointer:fine) {
+  .home-about-thanks-btn:hover {
+    border-bottom-color: var(--accent-warm);
+  }
+}
+
+@media (max-width:480px) {
+  .thanks-names {
+    columns: 1;
+  }
+}
+
+@media (max-width:480px) {
+  :root {
+    --fs-6: 26px;
+  }
+}
+
+@media (max-width:640px) {
+  .ws-edge-nav {
+    padding: var(--sp-5) var(--sp-1);
+  }
+
+  .ws-edge-nav-embedded.ws-edge-nav-left {
+    left: var(--sp-2);
+  }
+
+  .ws-edge-nav-embedded.ws-edge-nav-right {
+    right: var(--sp-2);
+  }
+}
+
+@media (max-width:640px) {
+  .cad-control-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+@media (max-width:640px) {
+  .cad-head {
+    flex-direction: column;
+  }
+}
+
+@media (max-width:980px) {
+  .cad-tool-settings {
+    margin-left: 0;
+    padding-left: 0;
+    flex-basis: 100%;
+    padding-top: var(--sp-2);
+    border-top: 1px solid var(--line);
+  }
+}
+
+@media (max-width:760px) {
+  .cad-board {
+    height: auto;
+  }
+
+  .cad-canvas-wrap {
+    height: auto;
+    min-height: 340px;
+  }
+
+  .cad-cartasolar-wrap,
+  .cad-wind-settings-wrap {
+    position: static;
+  }
+
+  .cad-widget-drop {
+    left: auto;
+    right: 0;
+  }
+}
+
+@media (max-width:900px) {
+  .shade-canvas-col {
+    grid-template-columns: 1fr;
+  }
+
+  .shade-diagram canvas {
+    height: min(24vh,300px);
+    min-height: 220px;
+  }
+}
+
+/* ============================================================
+   AJUSTES ADICIONALES PARA CELULAR (revisión general de todas
+   las pantallas: inicio, carta solar, diagramas, CAD y visor 3D)
+   ============================================================ */
+
+/* Pestañas (diagramas: Vientos / Temperatura / Bochorno, y otras
+   .tab) — que se envuelvan en vez de desbordarse horizontalmente */
+@media (max-width:640px) {
+  .tabs {
+    flex-wrap: wrap;
+    row-gap: var(--sp-2);
+  }
+
+  .shade-view-btn,
+  .tab {
+    flex: 1 1 auto;
+    min-width: 0;
+    padding: var(--sp-2) var(--sp-3);
+    font-size: var(--fs-2);
+    text-align: center;
+  }
+}
+
+/* Paneles "Personalizar" (carta solar y rosa de los vientos): en
+   escritorio se abren hacia la izquierda con un ancho fijo de
+   320px, lo que en un celular los saca de la pantalla. Aquí se
+   centran como una ventana flotante que sí cabe. */
+@media (max-width:760px) {
+  .style-panel,
+  .wind-style-panel {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    right: auto;
+    margin: 0;
+    transform: translate(-50%,-50%);
+    width: min(320px,calc(100vw - var(--sp-5) * 2));
+    max-height: calc(100vh - var(--sp-7) * 2);
+  }
+}
+
+/* Menús desplegables del CAD y del visor 3D (ajustes de viento):
+   que no se salgan del ancho de la pantalla en celulares chicos */
+@media (max-width:480px) {
+  .cad-widget-drop {
+    width: min(228px,calc(100vw - var(--sp-5) * 2));
+  }
+
+  .cad-wind-drop {
+    width: min(320px,calc(100vw - var(--sp-5) * 2));
+  }
+}
+
+/* Inicio: 2 columnas en vez de 3 para que los botones sean más
+   grandes y fáciles de tocar con el dedo */
+@media (max-width:480px) {
+  .home-windows {
+    grid-template-columns: repeat(2,1fr);
+  }
+}
+
+/* Visor 3D (viento): la barra lateral fija de 360px no cabe junto
+   al visor en un celular. Se apila debajo, con su propio scroll,
+   y el cubo de orientación se reduce para no tapar tanto el visor. */
+@media (max-width:760px) {
+  #wsPanel4 #v3d_app {
+    grid-template-columns: 1fr;
+    grid-template-rows: 56px minmax(220px,1fr) auto;
+  }
+
+  #wsPanel4 header {
+    grid-column: 1;
+  }
+
+  #wsPanel4 aside {
+    max-height: 42vh;
+    border-left: none;
+    border-top: 1px solid var(--line);
+  }
+
+  #wsPanel4 #v3d_viewcubeWrap {
+    top: 8px;
+    right: 8px;
+    width: 108px;
+    height: 108px;
+  }
+
+  #wsPanel4 #v3d_viewcube {
+    top: var(--sp-3);
+    left: var(--sp-3);
+    width: 68px;
+    height: 68px;
+  }
 }
   </style>
 </head>
