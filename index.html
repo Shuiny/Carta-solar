@@ -4219,6 +4219,57 @@ input[type=color].style-color::-moz-color-swatch {
     height: 68px;
   }
 }
+
+/* ============================================================
+   AJUSTES ADICIONALES 2 · Grupos de botones de cabecera que en
+   pantallas angostas se salían del ancho (provocaban scroll
+   horizontal): "¿Cómo usarlo? / Cambiar archivo EPW / Superponer
+   viento", "Tema blanco / Descargar PNG", "Restablecer / Guardar
+   estilo / Cargar estilo", etc. Se les permite envolver en varias
+   líneas en vez de desbordarse.
+   ============================================================ */
+@media (max-width:640px) {
+  .epw-upload {
+    align-self: stretch;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    row-gap: var(--sp-2);
+  }
+
+  .epw-status {
+    position: static;
+    width: 100%;
+    max-width: none;
+    white-space: normal;
+    text-align: right;
+    margin-top: var(--sp-1);
+  }
+
+  .cad-howto-wrap,
+  .foot-actions,
+  .style-footer-row,
+  .cad-layers-actions {
+    flex-wrap: wrap;
+    row-gap: var(--sp-2);
+  }
+
+  .cad-layers-actions {
+    justify-content: flex-start;
+  }
+}
+
+/* Botones un poco más altos en celular para que sean más fáciles
+   de tocar con el dedo (los mismos botones, sin cambiar su
+   apariencia en escritorio) */
+@media (max-width:480px) {
+  .shade-view-btn,
+  .tab,
+  .wind-filter-btn,
+  .wind-rose-tab,
+  button.dl {
+    min-height: 40px;
+  }
+}
   </style>
 </head>
 <body>
