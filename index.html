@@ -36,8 +36,31 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Carta solar</title>
+  <meta name="description" content="Carta solar interactiva: trayectoria solar, diagramas de sombreado, mapa de construcciones y simulador de viento para tu proyecto, a partir de cualquier archivo climático EPW.">
+  <link rel="canonical" href="https://cartasolar.com/">
+
+  <!-- Open Graph / redes sociales y previews de enlace (WhatsApp, etc.) -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Carta solar">
+  <meta property="og:title" content="Carta solar">
+  <meta property="og:description" content="Trayectoria solar, sombras y viento para tu proyecto. Sube tu archivo EPW y genera la carta solar al instante.">
+  <meta property="og:url" content="https://cartasolar.com/">
+  <meta property="og:image" content="https://cartasolar.com/og-banner.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:locale" content="es_MX">
+
+  <!-- Twitter Card (algunos clientes lo usan también) -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Carta solar">
+  <meta name="twitter:description" content="Trayectoria solar, sombras y viento para tu proyecto.">
+  <meta name="twitter:image" content="https://cartasolar.com/og-banner.png">
+
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='8' fill='none' stroke='%23d9a25f' stroke-width='2.6'/%3E%3Cg stroke='%23d9a25f' stroke-width='2.6' stroke-linecap='round'%3E%3Cline x1='16' y1='1' x2='16' y2='5'/%3E%3Cline x1='16' y1='27' x2='16' y2='31'/%3E%3Cline x1='1' y1='16' x2='5' y2='16'/%3E%3Cline x1='27' y1='16' x2='31' y2='16'/%3E%3Cline x1='5.2' y1='5.2' x2='8' y2='8'/%3E%3Cline x1='24' y1='24' x2='26.8' y2='26.8'/%3E%3Cline x1='5.2' y1='26.8' x2='8' y2='24'/%3E%3Cline x1='24' y1='8' x2='26.8' y2='5.2'/%3E%3C/g%3E%3C/svg%3E">
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/MarkerCluster.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/MarkerCluster.Default.css">
 
   <style>
 /* ============================================================
@@ -1305,8 +1328,6 @@ input[type=color].style-color::-moz-color-swatch {
 #wsPanel4 {
   position: fixed!important;
   inset: 0;
-  width: 100vw;
-  height: 100vh;
   overflow: hidden;
 }
 
@@ -1603,6 +1624,178 @@ input[type=color].style-color::-moz-color-swatch {
 .account-panel-close svg {
   width: 14px;
   height: 14px;
+}
+
+.epwmap-panel {
+  position: relative;
+  width: 100%;
+  max-width: 900px;
+  max-height: 88vh;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--r-4);
+  padding: var(--sp-6) var(--sp-5) var(--sp-5);
+}
+
+.epwmap-note {
+  margin: 0;
+  padding-right: var(--sp-6);
+  font-size: var(--fs-2);
+  line-height: 1.5;
+  color: var(--ink-dim);
+}
+
+.epwmap-note a {
+  color: var(--accent-warm);
+}
+
+.epwmap-regions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+}
+
+.epwmap-regions button.dl {
+  padding: var(--sp-1) var(--sp-3);
+  font-size: var(--fs-1);
+}
+
+.epwmap-regions button.dl.active {
+  color: var(--ink);
+  border-color: var(--accent-warm);
+}
+
+.epwmap-status {
+  margin: 0;
+  min-height: 1.4em;
+  font-size: var(--fs-1);
+  color: var(--ink-dim);
+}
+
+.epwmap-search {
+  display: flex;
+  gap: var(--sp-2);
+  align-items: center;
+}
+
+.epwmap-search input[type="search"] {
+  flex: 1 1 auto;
+  padding: var(--sp-2) var(--sp-3);
+  font-size: var(--fs-2);
+  background: var(--bg);
+  color: var(--ink);
+  border: 1px solid var(--line);
+  border-radius: var(--r-2);
+}
+
+.epwmap-search input[type="search"]:focus {
+  outline: none;
+  border-color: var(--accent-warm);
+}
+
+.epwmap-search-results {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  max-height: 160px;
+  overflow-y: auto;
+  border: 1px solid var(--line);
+  border-radius: var(--r-2);
+  background: var(--bg);
+}
+
+.epwmap-search-results:empty {
+  display: none;
+  border: none;
+}
+
+.epwmap-search-results button {
+  all: unset;
+  cursor: pointer;
+  padding: var(--sp-2) var(--sp-3);
+  font-size: var(--fs-1);
+  color: var(--ink);
+}
+
+.epwmap-search-results button:hover,
+.epwmap-search-results button:focus-visible {
+  background: var(--panel-2, #222);
+  color: var(--accent-warm);
+}
+
+.epwmap-canvas {
+  flex: 1 1 auto;
+  min-height: 320px;
+  border-radius: var(--r-2);
+  overflow: hidden;
+  border: 1px solid var(--line);
+  background: #1a1a1a;
+  position: relative;
+}
+
+.epwmap-canvas .leaflet-container {
+  width: 100%;
+  height: 100%;
+  background: #1a1a1a;
+  font-family: inherit;
+}
+
+.epwmap-canvas .leaflet-control-attribution {
+  font-size: 10px;
+}
+
+.epwmap-loading {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--fs-1);
+  color: var(--ink-dim);
+  background: rgba(26,26,26,.7);
+  pointer-events: none;
+  z-index: 500;
+}
+
+.epwmap-loading[hidden] { display: none; }
+
+.epwmap-popup {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--sp-2);
+  min-width: 170px;
+}
+
+.epwmap-popup-title {
+  margin: 0;
+  font-size: var(--fs-2);
+  font-weight: 600;
+  color: #1b1b1b;
+}
+
+.epwmap-popup-sub {
+  margin: 0;
+  font-size: 11px;
+  color: #555;
+}
+
+.epwmap-popup button.dl {
+  padding: var(--sp-1) var(--sp-3);
+  font-size: var(--fs-1);
+}
+
+.epwmap-popup-links {
+  display: flex;
+  gap: var(--sp-2);
+}
+
+.epwmap-popup-links a {
+  font-size: 11px;
+  color: #555;
 }
 
 .ws-edge-nav {
@@ -4258,6 +4451,22 @@ input[type=color].style-color::-moz-color-swatch {
   }
 }
 
+/* Mapa mundial de EPW: en celular ocupa toda la pantalla en vez de
+   quedar como una ventana angosta */
+@media (max-width:640px) {
+  .epwmap-panel {
+    max-width: none;
+    width: 100%;
+    height: 100%;
+    max-height: 100%;
+    border-radius: var(--r-2);
+  }
+
+  .epwmap-canvas {
+    min-height: 240px;
+  }
+}
+
 /* Botones un poco más altos en celular para que sean más fáciles
    de tocar con el dedo (los mismos botones, sin cambiar su
    apariencia en escritorio) */
@@ -4359,6 +4568,7 @@ input[type=color].style-color::-moz-color-swatch {
           <div class="thanks-panel-body">
             <p class="thanks-section-label">Gracias a los donantes</p>
             <ul class="thanks-names" id="thanksDonors">
+              <li>Viena Olimpia Jiménez García</li>
             </ul>
             <p class="thanks-section-label">Gracias a mis maestros del Instituto Tecnológico de La Paz</p>
             <ul class="thanks-names">
@@ -4390,6 +4600,23 @@ input[type=color].style-color::-moz-color-swatch {
               <li>Yael Mendoza</li>
               <li>Yeiri Suhey Nieto Jiménez</li>
             </ul>
+          </div>
+        </div>
+      </div>
+      <div class="account-overlay" id="epwMapOverlay" role="dialog" aria-modal="true" aria-labelledby="epwMapTitle" hidden>
+        <div class="epwmap-panel">
+          <button class="account-panel-close" type="button" id="epwMapClose" aria-label="Cerrar">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+          </button>
+          <h2 class="thanks-panel-title" id="epwMapTitle">Mapa mundial de estaciones EPW</h2>
+          <p class="epwmap-note">+2000 estaciones del catálogo oficial de <a href="https://energyplus.net/weather" target="_blank" rel="noopener noreferrer">EnergyPlus (NREL)</a>. Haz clic en un pin y en "Cargar este EPW" — se descarga y se mete solo en la página, sin tener que subirlo a mano. Si algún archivo no se puede traer en vivo (algunos servidores bloquean la descarga directa desde el navegador), te dejo el enlace para descargarlo tú y subirlo con "Cambiar archivo EPW".</p>
+          <div class="epwmap-search">
+            <input type="search" id="epwMapSearch" placeholder="Buscar ciudad o país…" autocomplete="off">
+          </div>
+          <div class="epwmap-search-results" id="epwMapResults" hidden></div>
+          <p class="epwmap-status" id="epwMapStatus"></p>
+          <div class="epwmap-canvas" id="epwMapCanvas">
+            <div class="epwmap-loading" id="epwMapLoading">Cargando estaciones…</div>
           </div>
         </div>
       </div>
@@ -4434,6 +4661,7 @@ input[type=color].style-color::-moz-color-swatch {
                 <input type="file" id="epw-file" accept=".epw" style="display:none">
                 <button class="dl" id="how-to-btn" style="margin-right:var(--sp-3)">¿Cómo usarlo?</button>
                 <button class="dl" id="epw-btn">Cambiar archivo EPW</button>
+                <button class="dl" id="epw-map-btn" type="button">Mapa mundial de EPW</button>
                 <button class="dl" id="wind-overlay-btn" type="button" title="Superpone la rosa de los vientos (todo el año) sobre la carta solar, compartiendo el mismo centro">Superponer viento</button>
                 <p class="epw-status" id="epw-status"></p>
               </div>
@@ -8304,6 +8532,219 @@ window.createWindEngine = function (e, n, a) {
     const e = document.getElementById("thanksBtn"), n = document.getElementById("thanksOverlay"), t = document.getElementById("thanksPanelClose");
     function d() { n.hidden = !0; }
     e && n && t && (e.addEventListener("click", function () { n.hidden = !1; }), t.addEventListener("click", d), n.addEventListener("click", e => { e.target === n && d(); }), document.addEventListener("keydown", e => { "Escape" === e.key && !n.hidden && d(); }));
+}();
+  </script>
+
+  <!-- ---- 16b · JS · Mapa mundial de estaciones EPW (pines propios) ----
+       Climate.OneBuilding.Org no manda cabeceras CORS, así que en su lugar
+       se usa el catálogo oficial de EnergyPlus/NREL (master.geojson), que
+       vive en raw.githubusercontent.com y sí manda CORS abierto: se puede
+       leer su índice completo (+2000 estaciones) desde el navegador sin
+       proxy. Los .epw individuales están en un bucket S3 de NREL; si algún
+       día ese bucket no responde con CORS para un archivo en particular,
+       se reintenta con un par de proxies públicos y, si tampoco, se deja
+       el enlace directo para bajarlo a mano y subirlo con "Cambiar archivo
+       EPW" (igual que siempre). -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/leaflet.markercluster.js"></script>
+  <script>
+!function () {
+    "use strict";
+    var btn = document.getElementById("epw-map-btn");
+    var overlay = document.getElementById("epwMapOverlay");
+    var closeBtn = document.getElementById("epwMapClose");
+    var canvasEl = document.getElementById("epwMapCanvas");
+    var loadingEl = document.getElementById("epwMapLoading");
+    var statusEl = document.getElementById("epwMapStatus");
+    var searchInput = document.getElementById("epwMapSearch");
+    var resultsEl = document.getElementById("epwMapResults");
+    var epwInput = document.getElementById("epw-file");
+    if (!btn || !overlay || !canvasEl) return;
+
+    var MASTER_GEOJSON_URL = "https://raw.githubusercontent.com/NREL/EnergyPlus/develop/weather/master.geojson";
+    // Desde agosto de 2026 CARTO exige una API key gratuita para sus tiles
+    // (si no, estampa "API KEY REQUIRED" sobre el mapa). Consigue una gratis
+    // en https://carto.com/basemaps/apikey (no pide cuenta, toma ~1 min) y
+    // pégala aquí. Mientras esté vacía, se usa OpenStreetMap sin key como
+    // respaldo para que el mapa nunca se rompa.
+    var CARTO_API_KEY = "";
+    var PROXIES = [
+        function (u) { return "https://corsproxy.io/?url=" + encodeURIComponent(u); },
+        function (u) { return "https://api.allorigins.win/raw?url=" + encodeURIComponent(u); },
+        function (u) { return "https://api.codetabs.com/v1/proxy?quest=" + encodeURIComponent(u); }
+    ];
+
+    var map = null, clusterGroup = null, stations = [], opened = false, dataReady = false;
+
+    function normalize(s) {
+        return String(s || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+    }
+
+    function setStatus(msg) { if (statusEl) statusEl.textContent = msg || ""; }
+
+    function extractHref(html) {
+        var m = /href=["']?([^"'>]+)/i.exec(String(html || ""));
+        return m ? m[1] : "";
+    }
+
+    function popupHtml(st) {
+        var safeTitle = st.title.replace(/</g, "&lt;");
+        return '<div class="epwmap-popup">' +
+            '<p class="epwmap-popup-title">' + safeTitle + '</p>' +
+            '<p class="epwmap-popup-sub">' + st.lat.toFixed(2) + '°, ' + st.lon.toFixed(2) + '°</p>' +
+            '<button type="button" class="dl" data-epwmap-load="' + st.idx + '">Cargar este EPW</button>' +
+            '<div class="epwmap-popup-links"><a href="' + st.epwUrl + '" target="_blank" rel="noopener noreferrer">Descargar directo ↗</a></div>' +
+            '</div>';
+    }
+
+    function initMap() {
+        if (map) return false;
+        if (typeof L === "undefined") {
+            setStatus("No se pudo cargar la librería del mapa (Leaflet) desde cdnjs.cloudflare.com. Revisa tu conexión, un bloqueador de anuncios/extensión, o la configuración de red, y vuelve a abrir este panel.");
+            loadingEl.hidden = true;
+            return false;
+        }
+        map = L.map(canvasEl, { worldCopyJump: true }).setView([20, 10], 2);
+        if (CARTO_API_KEY) {
+            L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png?api_key=" + encodeURIComponent(CARTO_API_KEY), {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
+                subdomains: "abcd",
+                maxZoom: 19
+            }).addTo(map);
+        } else {
+            L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+                subdomains: "abc",
+                maxZoom: 19
+            }).addTo(map);
+        }
+        clusterGroup = L.markerClusterGroup({ chunkedLoading: true, disableClusteringAtZoom: 9 });
+        map.addLayer(clusterGroup);
+        map.on("popupopen", function (e) {
+            var el = e.popup.getElement();
+            var btnEl = el && el.querySelector("[data-epwmap-load]");
+            if (!btnEl) return;
+            btnEl.addEventListener("click", function () {
+                var idx = +btnEl.getAttribute("data-epwmap-load");
+                loadStationEpw(stations[idx]);
+            });
+        });
+        return true;
+    }
+
+    function loadStations() {
+        if (dataReady) return Promise.resolve();
+        setStatus("Cargando catálogo de estaciones (EnergyPlus/NREL)…");
+        return fetch(MASTER_GEOJSON_URL).then(function (r) {
+            if (!r.ok) throw new Error("HTTP " + r.status);
+            return r.json();
+        }).then(function (geo) {
+            var markers = [];
+            (geo.features || []).forEach(function (f, i) {
+                var p = f.properties || {}, g = f.geometry || {};
+                var coords = g.coordinates || [];
+                var lon = coords[0], lat = coords[1];
+                var epwUrl = extractHref(p.epw);
+                if (!isFinite(lat) || !isFinite(lon) || !epwUrl) return;
+                var st = { idx: stations.length, title: p.title || ("Estación " + i), lat: lat, lon: lon, epwUrl: epwUrl };
+                stations.push(st);
+                var m = L.marker([lat, lon]);
+                m.bindPopup(popupHtml(st));
+                markers.push(m);
+            });
+            clusterGroup.addLayers(markers);
+            dataReady = true;
+            setStatus(stations.length + " estaciones cargadas. Busca o haz clic en un pin.");
+        }).catch(function (err) {
+            setStatus("No se pudo cargar el catálogo de estaciones (" + err.message + "). Intenta de nuevo o revisa tu conexión.");
+        });
+    }
+
+    function tryFetchText(url) {
+        function attempt(i) {
+            var target = i === 0 ? url : PROXIES[i - 1](url);
+            return fetch(target).then(function (r) {
+                if (!r.ok) throw new Error("HTTP " + r.status);
+                return r.text();
+            }).catch(function (err) {
+                if (i < PROXIES.length) return attempt(i + 1);
+                throw err;
+            });
+        }
+        return attempt(0);
+    }
+
+    function loadStationEpw(st) {
+        if (!st) return;
+        setStatus("Descargando " + st.title + "…");
+        tryFetchText(st.epwUrl).then(function (raw) {
+            if (!/^LOCATION,/m.test(raw)) throw new Error("el archivo recibido no parece un EPW válido");
+            var blob = new Blob([raw], { type: "text/plain" });
+            var filename = st.epwUrl.split("/").pop() || (st.title + ".epw");
+            var file = new File([blob], filename, { type: "text/plain" });
+            var dt = new DataTransfer();
+            dt.items.add(file);
+            epwInput.files = dt.files;
+            epwInput.dispatchEvent(new Event("change", { bubbles: true }));
+            setStatus("");
+            closeOverlay();
+        }).catch(function (err) {
+            setStatus("No se pudo cargar \"" + st.title + "\" en vivo (" + err.message + "). Usa \"Descargar directo\" en el pin y súbelo con \"Cambiar archivo EPW\".");
+        });
+    }
+
+    function renderResults(list) {
+        resultsEl.innerHTML = "";
+        if (!list.length) { resultsEl.hidden = true; return; }
+        list.slice(0, 8).forEach(function (st) {
+            var b = document.createElement("button");
+            b.type = "button";
+            b.textContent = st.title.replace(/_/g, " ");
+            b.addEventListener("click", function () {
+                var real = clusterGroup.getLayers().filter(function (lay) {
+                    var ll = lay.getLatLng();
+                    return Math.abs(ll.lat - st.lat) < 1e-6 && Math.abs(ll.lng - st.lon) < 1e-6;
+                })[0];
+                if (real) {
+                    clusterGroup.zoomToShowLayer(real, function () { real.openPopup(); });
+                } else {
+                    map.setView([st.lat, st.lon], 10);
+                }
+                resultsEl.hidden = true;
+                searchInput.blur();
+            });
+            resultsEl.appendChild(b);
+        });
+        resultsEl.hidden = false;
+    }
+
+    searchInput && searchInput.addEventListener("input", function () {
+        var q = normalize(searchInput.value.trim());
+        if (q.length < 2) { resultsEl.hidden = true; resultsEl.innerHTML = ""; return; }
+        var matches = stations.filter(function (st) { return normalize(st.title).indexOf(q) !== -1; });
+        renderResults(matches);
+    });
+
+    function openOverlay() {
+        overlay.hidden = false;
+        if (!opened) {
+            opened = true;
+            loadingEl.hidden = false;
+            if (!initMap()) { opened = false; return; }
+            loadStations().then(function () {
+                loadingEl.hidden = true;
+                setTimeout(function () { map.invalidateSize(); }, 60);
+            });
+        } else {
+            setTimeout(function () { map.invalidateSize(); }, 60);
+        }
+    }
+    function closeOverlay() { overlay.hidden = true; }
+
+    btn.addEventListener("click", openOverlay);
+    closeBtn && closeBtn.addEventListener("click", closeOverlay);
+    overlay.addEventListener("click", function (e) { if (e.target === overlay) closeOverlay(); });
+    document.addEventListener("keydown", function (e) { if (e.key === "Escape" && !overlay.hidden) closeOverlay(); });
 }();
   </script>
 
