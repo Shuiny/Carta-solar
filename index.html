@@ -5560,7 +5560,7 @@ else {
 } return o; } function oe(e) { if (v.nowManual && v.nowManualDate) {
     const [e, t, n] = v.nowManualDate.split("-").map(Number);
     return { doy: Math.floor((Date.UTC(e, t - 1, n) - Date.UTC(e, 0, 1)) / 864e5) + 1, hourLocal: v.nowManualHour, day: n, month: t, year: e };
-} const t = new Date(Date.now() + 36e5 * e); return { doy: Math.floor((Date.UTC(t.getUTCFullYear(), t.getUTCMonth(), t.getUTCDate()) - Date.UTC(t.getUTCFullYear(), 0, 1)) / 864e5) + 1, hourLocal: t.getUTCHours() + t.getUTCMinutes() / 60 + t.getUTCSeconds() / 3600, day: t.getUTCDate(), month: t.getUTCMonth() + 1, year: t.getUTCFullYear() }; } const ae = { 1: { dayMin: 1, dayMax: 181, months: [1, 2, 3, 4, 5, 6], label: "Enero a Junio" }, 2: { dayMin: 182, dayMax: 365, months: [7, 8, 9, 10, 11, 12], label: "Julio a Diciembre" } }, le = { light: { bg: "#ffffff", ring: "rgba(0,0,0,0.10)", spoke: "rgba(0,0,0,0.10)", month: "rgba(0,0,0,0.65)", hour: "rgba(0,0,0,0.35)", rim: "#000000", elevLabel: "rgba(0,0,0,0.55)", cardinal: "#000000", title: "#000000" }, transparent: { bg: null, ring: "rgba(0,0,0,0.10)", spoke: "rgba(0,0,0,0.10)", month: "rgba(0,0,0,0.65)", hour: "rgba(0,0,0,0.35)", rim: "#000000", elevLabel: "rgba(0,0,0,0.55)", cardinal: "#000000", title: "#000000" } }; function ie(e) { return "dark" === e || "export" === e ? { bg: "export" === e && "#ffffff" === v.bgColor.toLowerCase() ? null : M(v.bgColor, v.bgOpacity), ring: M(v.gridColor, v.gridOpacity), spoke: M(v.spokeColor, v.spokeOpacity), month: M(v.gridColor, .55), hour: M(v.gridColor, .28), rim: v.gridColor, elevLabel: M(v.textColor, v.textOpacity), cardinal: v.textColor, title: v.textColor } : le[e] || le.light; } let re = 1, ce = 180, se = !1, de = [], ue = "la_paz", me = window.__cadObstructionMask || null; const he = new Map, ge = new Map; let fe = "temp", ye = null; function pe(e, t, n) { return (t.x - e.x) * (n.y - e.y) - (t.y - e.y) * (n.x - e.x); } function ve(t, n, o) { const a = ie(o), l = ae[n]; t.save(), _(t), t.clip(), a.bg && (t.fillStyle = a.bg, t.fillRect(0, 0, i, r)), N(t, a); const c = e.days, s = e.hours, d = v.simplified ? (ye || (ye = function () { const t = e.temp, n = t.length; if (!n)
+} const t = new Date(Date.now() + 36e5 * e); return { doy: Math.floor((Date.UTC(t.getUTCFullYear(), t.getUTCMonth(), t.getUTCDate()) - Date.UTC(t.getUTCFullYear(), 0, 1)) / 864e5) + 1, hourLocal: t.getUTCHours() + t.getUTCMinutes() / 60 + t.getUTCSeconds() / 3600, day: t.getUTCDate(), month: t.getUTCMonth() + 1, year: t.getUTCFullYear() }; } const ae = { 1: { dayMin: 1, dayMax: 181, months: [1, 2, 3, 4, 5, 6], label: "Enero a Junio" }, 2: { dayMin: 182, dayMax: 365, months: [7, 8, 9, 10, 11, 12], label: "Julio a Diciembre" } }, le = { light: { bg: "#ffffff", ring: "rgba(0,0,0,0.10)", spoke: "rgba(0,0,0,0.10)", month: "rgba(0,0,0,0.65)", hour: "rgba(0,0,0,0.35)", rim: "#000000", elevLabel: "rgba(0,0,0,0.55)", cardinal: "#000000", title: "#000000" }, transparent: { bg: null, ring: "rgba(0,0,0,0.10)", spoke: "rgba(0,0,0,0.10)", month: "rgba(0,0,0,0.65)", hour: "rgba(0,0,0,0.35)", rim: "#000000", elevLabel: "rgba(0,0,0,0.55)", cardinal: "#000000", title: "#000000" } }; function ie(e) { return "dark" === e || "export" === e ? { bg: "export" === e ? null : M(v.bgColor, v.bgOpacity), ring: M(v.gridColor, v.gridOpacity), spoke: M(v.spokeColor, v.spokeOpacity), month: M(v.gridColor, .55), hour: M(v.gridColor, .28), rim: v.gridColor, elevLabel: M(v.textColor, v.textOpacity), cardinal: v.textColor, title: v.textColor } : le[e] || le.light; } let re = 1, ce = 180, se = !1, de = [], ue = "la_paz", me = window.__cadObstructionMask || null; const he = new Map, ge = new Map; let fe = "temp", ye = null; function pe(e, t, n) { return (t.x - e.x) * (n.y - e.y) - (t.y - e.y) * (n.x - e.x); } function ve(t, n, o) { const a = ie(o), l = ae[n]; t.save(), _(t), t.clip(), a.bg && (t.fillStyle = a.bg, t.fillRect(0, 0, i, r)), N(t, a); const c = e.days, s = e.hours, d = v.simplified ? (ye || (ye = function () { const t = e.temp, n = t.length; if (!n)
     return t; const o = t[0].length, a = Math.round(18), l = []; let i = 0; for (let e = -a; e <= a; e++) {
     const t = Math.exp(-e * e / 72);
     l.push(t), i += t;
@@ -5860,7 +5860,7 @@ else
     const e = c.split(" ");
     let t = "";
     e.forEach((n, o) => { const a = t ? t + " " + n : n; m.measureText(a).width > 100 && t ? (h.push(t), t = n) : t = a, o === e.length - 1 && t && h.push(t); });
-} const g = h.length ? 26 * h.length + 22 : 0, f = 2 * (u - 300), y = 2 * (u + 300), p = Math.max(0, g + 10 - f), ovEl = document.getElementById("wind-overlay-canvas"), hasWind = !(!ovEl || !ovEl.classList.contains("is-visible")), b = document.createElement("canvas"); b.width = e.width + n, b.height = e.height + p + 34 + (hasWind ? 22 : 0); const x = b.getContext("2d"); "#ffffff" !== v.bgColor.toLowerCase() && (x.fillStyle = M(v.bgColor, v.bgOpacity), x.fillRect(0, 0, b.width, b.height)), x.drawImage(e, 0, p), hasWind && x.drawImage(ovEl, 0, 0, ovEl.width, ovEl.height, 0, p, e.width, e.height), it(x, 2 * d, p + e.height + 17, hasWind), function () { if (!a)
+} const g = h.length ? 26 * h.length + 22 : 0, f = 2 * (u - 300), y = 2 * (u + 300), p = Math.max(0, g + 10 - f), ovEl = document.getElementById("wind-overlay-canvas"), hasWind = !(!ovEl || !ovEl.classList.contains("is-visible")), b = document.createElement("canvas"); b.width = e.width + n, b.height = e.height + p + 34 + (hasWind ? 22 : 0); const x = b.getContext("2d"); x.drawImage(e, 0, p), hasWind && x.drawImage(ovEl, 0, 0, ovEl.width, ovEl.height, 0, p, e.width, e.height), it(x, 2 * d, p + e.height + 17, hasWind), function () { if (!a)
     return; const e = l ? Array.from(l.children).map(e => e.textContent) : [], n = getComputedStyle(a).backgroundImage, o = /(rgba?\([^)]+\))\s*([\d.]+)%/g, i = []; let r; for (; r = o.exec(n);)
     i.push({ color: r[1], pct: parseFloat(r[2]) }); if (!i.length)
     return; const c = t, d = c, u = M(v.textColor, .92), m = f + p, g = y - f; if (h.length) {
@@ -5878,7 +5878,7 @@ else
     const e = g.split(" ");
     let t = "";
     e.forEach((n, o) => { const a = t ? t + " " + n : n; y.measureText(a).width > 100 && t ? (p.push(t), t = n) : t = a, o === e.length - 1 && t && p.push(t); });
-} const b = p.length ? 26 * p.length + 22 : 0, x = 2 * (u - 300), E = 2 * (u + 300), C = (document.getElementById("loc-title") || {}).textContent || "", w = C ? 49 : 0, k = w + Math.max(0, b + 10 - x), ovEl2 = document.getElementById("wind-overlay-canvas"), hasWind2 = !(!ovEl2 || !ovEl2.classList.contains("is-visible")), I = document.createElement("canvas"); I.width = l + o.width + c, I.height = Math.max(n.height, o.height) + k + 34 + (hasWind2 ? 22 : 0); const B = I.getContext("2d"); "#ffffff" !== v.bgColor.toLowerCase() && (B.fillStyle = M(v.bgColor, v.bgOpacity), B.fillRect(0, 0, I.width, I.height)), B.drawImage(n, 0, k), B.drawImage(o, l, k); hasWind2 && (B.drawImage(ovEl2, 0, 0, ovEl2.width, ovEl2.height, 0, k, n.width, n.height), B.drawImage(ovEl2, 0, 0, ovEl2.width, ovEl2.height, l, k, o.width, o.height)); const L = l / 2 + 2 * d; it(B, L, k + Math.max(n.height, o.height) + 17, hasWind2), C && (B.textAlign = "center", B.textBaseline = "alphabetic", B.fillStyle = M(v.textColor, .95), B.font = '700 34px "Courier New", monospace', B.fillText(C.toUpperCase(), L, 39.68)), function () { if (!m)
+} const b = p.length ? 26 * p.length + 22 : 0, x = 2 * (u - 300), E = 2 * (u + 300), C = (document.getElementById("loc-title") || {}).textContent || "", w = C ? 49 : 0, k = w + Math.max(0, b + 10 - x), ovEl2 = document.getElementById("wind-overlay-canvas"), hasWind2 = !(!ovEl2 || !ovEl2.classList.contains("is-visible")), I = document.createElement("canvas"); I.width = l + o.width + c, I.height = Math.max(n.height, o.height) + k + 34 + (hasWind2 ? 22 : 0); const B = I.getContext("2d"); B.drawImage(n, 0, k), B.drawImage(o, l, k); hasWind2 && (B.drawImage(ovEl2, 0, 0, ovEl2.width, ovEl2.height, 0, k, n.width, n.height), B.drawImage(ovEl2, 0, 0, ovEl2.width, ovEl2.height, l, k, o.width, o.height)); const L = l / 2 + 2 * d; it(B, L, k + Math.max(n.height, o.height) + 17, hasWind2), C && (B.textAlign = "center", B.textBaseline = "alphabetic", B.fillStyle = M(v.textColor, .95), B.font = '700 34px "Courier New", monospace', B.fillText(C.toUpperCase(), L, 39.68)), function () { if (!m)
     return; const e = h ? Array.from(h.children).map(e => e.textContent) : [], t = getComputedStyle(m).backgroundImage, n = /(rgba?\([^)]+\))\s*([\d.]+)%/g, o = []; let i; for (; i = n.exec(t);)
     o.push({ color: i[1], pct: parseFloat(i[2]) }); if (!o.length)
     return; const r = l + a, c = r, s = M(v.textColor, .92), d = x + k, u = E - x; if (p.length) {
@@ -6213,10 +6213,6 @@ window.EXPORT_DS = (function () {
             arr.forEach(ch => { cx.fillText(ch, xx, y0); xx += cx.measureText(ch).width + step; });
         };
         const ink = S(st.textColor, 1);
-        if ("#ffffff" !== st.bgColor.toLowerCase()) {
-            cx.fillStyle = S(st.bgColor, st.bgOpacity || 1);
-            cx.fillRect(0, 0, Wt, Ht);
-        }
         cx.lineJoin = "round";
         cx.lineCap = "round";
         /* título (si no cabe sobre las rosas se reduce lo justo) */
@@ -6379,10 +6375,6 @@ window.EXPORT_DS = (function () {
             arr.forEach(ch => { cx.fillText(ch, xx, y0); xx += cx.measureText(ch).width + step; });
         };
         const ink = S(st.textColor, 1);
-        if ("#ffffff" !== st.bgColor.toLowerCase()) {
-            cx.fillStyle = S(st.bgColor, st.bgOpacity || 1);
-            cx.fillRect(0, 0, Wt, Ht);
-        }
         cx.lineJoin = "round";
         cx.lineCap = "round";
         let tpx = TY.title;
@@ -6590,12 +6582,7 @@ window.EXPORT_DS = (function () {
             cv.style.aspectRatio = W + "/" + Hc;
         }
         ctx.setTransform(1, 0, 0, 1, 0, -dy);
-        if (!light)
-            ctx.clearRect(0, dy, W, Hc);
-        else {
-            ctx.fillStyle = bg;
-            ctx.fillRect(0, dy, W, Hc);
-        }
+        ctx.clearRect(0, dy, W, Hc);
         ctx.textBaseline = "alphabetic";
         ctx.textAlign = "center";
         ctx.fillStyle = ink;
@@ -6845,12 +6832,7 @@ window.EXPORT_DS = (function () {
             cv.height = 260;
             cv.style.aspectRatio = W + "/260";
             ctx.setTransform(1, 0, 0, 1, 0, 0);
-            if (!light)
-                ctx.clearRect(0, 0, W, 260);
-            else {
-                ctx.fillStyle = bg;
-                ctx.fillRect(0, 0, W, 260);
-            }
+            ctx.clearRect(0, 0, W, 260);
             ctx.fillStyle = ink;
             ctx.textAlign = "center";
             ctx.textBaseline = "middle";
@@ -6863,12 +6845,7 @@ window.EXPORT_DS = (function () {
         const scr = !exporting, Hc = scr ? Math.round(HH - (yFoot - (yChip + chipH))) : HH;
         if (cv.height !== Hc) { cv.height = Hc; cv.style.aspectRatio = W + "/" + Hc; }
         ctx.setTransform(1, 0, 0, 1, 0, 0);
-        if (!light)
-            ctx.clearRect(0, 0, W, Hc);
-        else {
-            ctx.fillStyle = bg;
-            ctx.fillRect(0, 0, W, Hc);
-        }
+        ctx.clearRect(0, 0, W, Hc);
         const city = (data.city || (document.getElementById("loc-title") || {}).textContent || "").split(",")[0].trim();
         ttl && (ttl.textContent = "Niveles de comodidad de la humedad");
         ctx.textBaseline = "alphabetic";
