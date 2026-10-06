@@ -4088,6 +4088,7 @@ svg.map-on{pointer-events:none}
     b.grp=b.cfg.g?buttons.filter(function(o){return o.cfg.g===b.cfg.g;}):[b];});
   function select(b){
     if(b.label==='Donar'){window.open('https://buymeacoffee.com/angelpatron','_blank','noopener');return;}
+    if(b.label==='¿Como usarlo?'){window.open('https://www.youtube.com/watch?v=8l8jBlYSR9I','_blank','noopener');return;}
     if(b.fixed||b.cfg.mom)return;
     if(b.grp.length>1){b.grp.forEach(function(o){o.sel=(o===b);paint(o);});}
     else{b.sel=!b.sel;paint(b);}}
