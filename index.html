@@ -20,8 +20,25 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="Carta solar y análisis climático a partir de un archivo EPW">
+<meta name="description" content="Genera tu carta solar online y gratis: trayectoria del sol, máscara de sombra, aletas, volados y confort ASHRAE con el archivo EPW de tu ciudad.">
 <title>Carta solar</title>
+<link rel="canonical" href="https://cartasolar.com/">
+<meta name="robots" content="index,follow,max-image-preview:large">
+<link rel="icon" type="image/png" sizes="192x192" href="/favicon.png">
+<link rel="apple-touch-icon" href="/favicon.png">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Carta solar">
+<meta property="og:locale" content="es_MX">
+<meta property="og:title" content="Carta solar">
+<meta property="og:description" content="Genera tu carta solar online y gratis: trayectoria del sol, máscara de sombra, aletas, volados y confort ASHRAE con el archivo EPW de tu ciudad.">
+<meta property="og:url" content="https://cartasolar.com/">
+<meta property="og:image" content="https://cartasolar.com/og-banner.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Carta solar">
+<meta name="twitter:description" content="Genera tu carta solar online y gratis: trayectoria del sol, máscara de sombra, aletas, volados y confort ASHRAE con el archivo EPW de tu ciudad.">
+<meta name="twitter:image" content="https://cartasolar.com/og-banner.png">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebApplication", "name": "Carta solar", "alternateName": "cartasolar.com", "url": "https://cartasolar.com/", "description": "Genera tu carta solar online y gratis: trayectoria del sol, máscara de sombra, aletas, volados y confort ASHRAE con el archivo EPW de tu ciudad.", "applicationCategory": "DesignApplication", "operatingSystem": "Cualquiera (navegador web)", "browserRequirements": "Requiere JavaScript", "inLanguage": "es", "isAccessibleForFree": true, "offers": {"@type": "Offer", "price": "0", "priceCurrency": "MXN"}, "featureList": ["Carta solar a partir de un archivo EPW", "Buscador de archivos EPW en mapa", "Máscara de sombra, aletas y volados", "Confort ASHRAE sobre la carta solar", "Rosa de vientos", "Modelo 3D", "Diagramas de funcionamiento y relaciones para arquitectura", "Descarga en SVG y PNG"], "audience": {"@type": "Audience", "audienceType": "Estudiantes y profesionales de arquitectura y diseño bioclimático"}}</script>
+<style>.seo-sr{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0,0,0,0);clip-path:inset(50%);white-space:nowrap;border:0}</style>
 
 <!-- ============================ ESTILOS ============================ -->
 <!-- 1) Estilos propios: base, modo oscuro, páginas (About / Diagramas / Datos EPW) -->
@@ -744,6 +761,27 @@ svg.map-on{pointer-events:none}
 </style>
 </head>
 <body>
+<main class="seo-sr">
+<h1>Carta solar online: trayectoria del sol con el archivo EPW de tu ciudad</h1>
+<p>Herramienta gratuita para arquitectura y diseño bioclimático. Carga un archivo EPW o búscalo en el mapa y obtén la carta solar con la trayectoria del sol (azimut y altura solar) a lo largo del año, las horas de sol y sombra, y el análisis climático del lugar.</p>
+<h2>Qué puedes hacer</h2>
+<ul>
+<li>Ver la carta solar de cualquier ciudad a partir de su archivo EPW.</li>
+<li>Buscar el archivo EPW más cercano a tu proyecto en un mapa de estaciones meteorológicas.</li>
+<li>Probar máscara de sombra, aletas verticales y volados horizontales para el diseño de protecciones solares.</li>
+<li>Consultar la zona de confort ASHRAE sobre la carta solar, la rosa de vientos y los datos horarios del archivo EPW.</li>
+<li>Dibujar diagramas de funcionamiento y matrices de relaciones entre espacios.</li>
+<li>Descargar la carta solar como imagen SVG o PNG.</li>
+</ul>
+<h2>Cómo usarla</h2>
+<ol>
+<li>Abre cartasolar.com en tu navegador, sin instalar nada.</li>
+<li>Carga tu archivo EPW o usa «Buscar archivo EPW» para elegir la estación más cercana.</li>
+<li>Revisa la carta solar, activa aletas, volados o máscara de sombra y descarga el resultado.</li>
+</ol>
+<p><a href="/que-es-una-carta-solar/">¿Qué es una carta solar y cómo se lee?</a></p>
+</main>
+<noscript><p>Carta solar necesita JavaScript para funcionar. Es una herramienta gratuita que genera la carta solar y el análisis climático a partir de un archivo EPW.</p></noscript>
 
 <!-- ============================ DISEÑO (SVG) ============================ -->
 <!-- Carta solar tal como viene de Web.svg (1440x900). Las demás páginas se montan encima desde los bloques de datos. -->
@@ -5060,21 +5098,11 @@ svg.map-on{pointer-events:none}
           x=segHit(ep(A.a,A.b),ep(A.b,A.a),ep(B.a,B.b),ep(B.b,B.a));
           if(x){d=Math.hypot(x[0]-w.x,x[1]-w.y);if(d<bd){bd=d;best={x:x[0],y:x[1],A:A,B:B};}}}}
       return best;}
-    function splitCross(X){var c=addCircle(X.x,X.y,'Espacio'),n=cat();if(n)setCat(c,n);
+    function splitCross(X){var c=addCircle(X.x,X.y,'Espacio');   /* el espacio nacido en un cruce queda en blanco (sin tipo) */
       [X.A,X.B].forEach(function(l){var a=l.a.c,b=l.b.c,t=l.t,o=l.doff;
         gl.removeChild(l.g);ls.splice(ls.indexOf(l),1);
         addLine({c:a},{c:c.id},t,o);addLine({c:c.id},{c:b},t,o);});
       setSel(null);edit(c,true);}
-    /* todos los cruces de golpe (misma idea que el doble clic, sin abrir la edición de cada espacio) */
-    function planarizeAll(){var g,A,B,i,j,x,hit;
-      for(g=0;g<300;g++){hit=null;
-        for(i=0;i<ls.length&&!hit;i++){A=ls[i];if(A.a.c==null||A.b.c==null||!cs[A.a.c]||!cs[A.b.c])continue;
-          for(j=i+1;j<ls.length;j++){B=ls[j];if(B.a.c==null||B.b.c==null||!cs[B.a.c]||!cs[B.b.c])continue;
-            if(A.a.c===B.a.c||A.a.c===B.b.c||A.b.c===B.a.c||A.b.c===B.b.c)continue;
-            x=segHit(ep(A.a,A.b),ep(A.b,A.a),ep(B.a,B.b),ep(B.b,B.a));if(x){hit={x:x[0],y:x[1],A:A,B:B};break;}}}
-        if(!hit)break;
-        var c=addCircle(hit.x,hit.y,'Espacio');
-        [hit.A,hit.B].forEach(function(l){var a=l.a.c,b=l.b.c,t=l.t,o=l.doff;gl.removeChild(l.g);ls.splice(ls.indexOf(l),1);addLine({c:a},{c:c.id},t,o);addLine({c:c.id},{c:b},t,o);});}}
     function up(ev){
       var had=!!ptrs[ev.pointerId];delete ptrs[ev.pointerId];if(!had)return;
       if(pinch){if(Object.keys(ptrs).length<2)pinch=null;drag=null;return;}
@@ -5439,6 +5467,88 @@ svg.map-on{pointer-events:none}
       return best;}
     function countX(P,Ed){var c=0,i,j,a,b;for(i=0;i<Ed.length;i++)for(j=i+1;j<Ed.length;j++){a=Ed[i];b=Ed[j];
       if(a[0]===b[0]||a[0]===b[1]||a[1]===b[0]||a[1]===b[1])continue;if(segX(P[a[0]],P[a[1]],P[b[0]],P[b[1]]))c++;}return c;}
+    /* ---- Red NO plana: planarización ----
+       Se busca el subconjunto plano más grande (primero se conservan las relaciones "mucha"), se dibuja y las relaciones que sobran se cuelan por el camino con menos cruces.
+       Cada cruce se vuelve un espacio nuevo: la red queda plana y el método exacto la dibuja SIN cruces. Se prueban muchos órdenes y se queda con el que necesita menos espacios. */
+    function planarize(n,Ed,W,D,AW,AH,ms){
+      var BIG=100000,t0=performance.now(),m=Ed.length,best=null,drop=null,pairs=[],pk={},i,j,e,u,v,key;
+      function K(a,b){return a<b?a*BIG+b:b*BIG+a;}
+      for(i=0;i<m;i++){u=Ed[i][0];v=Ed[i][1];if(u===v)continue;key=K(u,v);
+        if(pk[key]===undefined){pk[key]=pairs.length;pairs.push({u:u,v:v,es:[i],w:W[i]});}else{pairs[pk[key]].es.push(i);pairs[pk[key]].w=Math.max(pairs[pk[key]].w,W[i]);}}
+      var np=pairs.length;
+      function facesOf(R2){var N=R2.length,pos=[],fid={},F=[],a,b,i,x,f,aa,bb,s,t,idf;
+        for(a=0;a<N;a++){var p={};R2[a].forEach(function(w,j){p[w]=j;});pos.push(p);}
+        for(a=0;a<N;a++)for(i=0;i<R2[a].length;i++){b=R2[a][i];if(fid[a*BIG+b]!==undefined)continue;
+          f=[];s=a;t=b;aa=a;bb=b;idf=F.length;
+          do{fid[aa*BIG+bb]=idf;f.push(aa);x=R2[bb][(pos[bb][aa]+1)%R2[bb].length];aa=bb;bb=x;}while(!(aa===s&&bb===t));
+          F.push(f);}
+        return {F:F,fid:fid};}
+      do{
+        var ord=[],sub=[],keep=[],rem=[],ok=true,limit=best?best.k:1e9;
+        for(i=0;i<np;i++)ord.push(i);
+        for(j=np-1;j>0;j--){i=Math.floor(Math.random()*(j+1));e=ord[j];ord[j]=ord[i];ord[i]=e;}
+        ord.sort(function(a,b){return pairs[b].w-pairs[a].w;});
+        for(i=0;i<np;i++){e=ord[i];sub.push([pairs[e].u,pairs[e].v]);if(lrEmbed(n,sub))keep.push(e);else{sub.pop();rem.push(e);}}
+        if(!rem.length){best={k:0,chains:[],edges:sub,n:n};break;}
+        var dsc=rem.length*10;rem.forEach(function(p){if(pairs[p].w>1)dsc+=5;});
+        if(!drop||dsc<drop.s)drop={s:dsc,e:rem.map(function(p){return pairs[p].es[0];})};
+        var rot=lrEmbed(n,sub);if(!rot)continue;
+        var R2=rot.map(function(a){return a.slice();}),chains=[],owner={},nid=n;
+        keep.forEach(function(p){chains.push({es:pairs[p].es,v:[pairs[p].u,pairs[p].v]});owner[K(pairs[p].u,pairs[p].v)]=chains.length-1;});
+        for(var ri=0;ri<rem.length&&ok;ri++){
+          var pr=pairs[rem[ri]],pu=pr.u,pv=pr.v,fc=facesOf(R2),F=fc.F,fid=fc.fid,start=[],goal={},prev={},pe={},seen={},queue,qi,found=-1,f,L,a,b,g;
+          F.forEach(function(ff,id){if(ff.indexOf(pu)>=0)start.push(id);if(ff.indexOf(pv)>=0)goal[id]=1;});
+          queue=start.slice();start.forEach(function(id){seen[id]=1;});
+          for(qi=0;qi<queue.length;qi++){f=queue[qi];if(goal[f]){found=f;break;}L=F[f].length;
+            for(i=0;i<L;i++){a=F[f][i];b=F[f][(i+1)%L];if(a===pu||a===pv||b===pu||b===pv)continue;
+              g=fid[b*BIG+a];if(g===f||seen[g])continue;seen[g]=1;prev[g]=f;pe[g]=[a,b];queue.push(g);}}
+          if(found<0){ok=false;break;}
+          var fl=[found],cr=[],cur=found;
+          while(prev[cur]!==undefined){cr.unshift(pe[cur]);cur=prev[cur];fl.unshift(cur);}
+          var kk=cr.length;if(nid-n+kk>=limit){ok=false;break;}
+          var F0=F[fl[0]],Fk=F[fl[kk]],iu=F0.indexOf(pu),iv=Fk.indexOf(pv),inU=F0[(iu-1+F0.length)%F0.length],inV=Fk[(iv-1+Fk.length)%Fk.length];
+          var xs=[];
+          for(i=0;i<kk;i++){var x=nid+i,aa=cr[i][0],bb=cr[i][1],pv0=i===0?pu:x-1,nx=i===kk-1?pv:x+1;xs.push(x);
+            R2[x]=[aa,pv0,bb,nx];R2[aa][R2[aa].indexOf(bb)]=x;R2[bb][R2[bb].indexOf(aa)]=x;
+            var c=owner[K(aa,bb)],cv=chains[c].v,q;
+            for(q=0;q<cv.length-1;q++)if((cv[q]===aa&&cv[q+1]===bb)||(cv[q]===bb&&cv[q+1]===aa))break;
+            cv.splice(q+1,0,x);delete owner[K(aa,bb)];owner[K(aa,x)]=c;owner[K(x,bb)]=c;}
+          R2[pu].splice(R2[pu].indexOf(inU)+1,0,kk?nid:pv);
+          R2[pv].splice(R2[pv].indexOf(inV)+1,0,kk?nid+kk-1:pu);
+          var nv=[pu].concat(xs,[pv]);chains.push({es:pr.es,v:nv});var ci=chains.length-1;
+          for(q=0;q<nv.length-1;q++)owner[K(nv[q],nv[q+1])]=ci;
+          nid+=kk;}
+        if(!ok)continue;
+        var ed=[];chains.forEach(function(ch){for(q=0;q<ch.v.length-1;q++)ed.push([ch.v[q],ch.v[q+1]]);});
+        if(!best||nid-n<best.k)best={k:nid-n,chains:chains.filter(function(ch){return ch.v.length>2;}),edges:ed,n:nid};
+      }while(performance.now()-t0<ms);
+      if(best)best.drop=drop?drop.e:[];
+      return best;}
+    /* Red NO plana: se busca un subconjunto plano lo más grande posible (primero se conservan las relaciones "mucha"), se dibuja SIN cruces con el método exacto
+       y las relaciones que sobraron se trazan encima. Se repite con distintos órdenes y se queda con el que menos cruces deja. */
+    function planarSeed(n,Ed,W,D,AW,AH,ms){
+      var t0=performance.now(),m=Ed.length,best=null,bc=1e18,ord,i,j,t,keep,sub,P,c,e;
+      do{ord=[];for(i=0;i<m;i++)ord.push(i);
+        for(j=m-1;j>0;j--){i=Math.floor(Math.random()*(j+1));t=ord[j];ord[j]=ord[i];ord[i]=t;}
+        ord.sort(function(a,b){return W[b]-W[a];});                         /* estable: las de más peso primero, en orden al azar */
+        keep=[];sub=[];
+        for(i=0;i<m;i++){e=ord[i];sub.push(Ed[e]);if(lrEmbed(n,sub))keep.push(e);else sub.pop();}
+        P=planarOnce(n,sub,D,AW,AH);if(!P)continue;
+        c=cost(P,Ed,D);if(c<bc){bc=c;best=P;}
+      }while(performance.now()-t0<ms);
+      return best;}
+    /* Red plana: muchos dibujos exactos (cada uno tarda milisegundos), cada uno se encoge a dos tamaños razonables y se quedan los 2 con menos choques;
+       además se guarda el exacto más pequeño (grande pero sin ningún choque) como respaldo seguro. */
+    function planarSeeds(n,Ed,D,AW,AH,ms){
+      var t0=performance.now(),small=null,ss=1e18,MU=[2.3,3.2,4.5,6.0],best=[null,null,null,null],P,x0,x1,y0,y1,sz,f,Q,tries=0,seeds=[];
+      do{P=planarOnce(n,Ed,D,AW,AH);tries++;if(!P){if(tries===1)return null;continue;}
+        x0=1e18;x1=-1e18;y0=1e18;y1=-1e18;P.forEach(function(p){x0=Math.min(x0,p[0]);x1=Math.max(x1,p[0]);y0=Math.min(y0,p[1]);y1=Math.max(y1,p[1]);});
+        sz=Math.max(x1-x0,y1-y0)||1;if(sz<ss){ss=sz;small=P;}
+        MU.forEach(function(mu,k){f=Math.min(1,D*mu*Math.sqrt(n)/sz);
+          Q=P.map(function(p){return [(p[0]-x0)*f+R+4,(p[1]-y0)*f+R+4];});cost(Q,Ed,D);if(!best[k]||VIOL<best[k].v)best[k]={Q:Q,v:VIOL};});
+      }while(performance.now()-t0<(ms||400)&&tries<400);
+      best.forEach(function(b){if(b)seeds.push(b.Q);});                /* de más justo a más holgado: los reintentos tienen más espacio */
+      return {small:small,seeds:seeds,v:best[0]?best[0].v:0};}
     function grid(n,Wl,Hl){var B=[R+4,Wl-R-4,R+4,Hl-R-4],cols=Math.max(1,Math.round(Math.sqrt(n*Wl/Hl))),rows=Math.ceil(n/cols),i,P=[];
       for(i=0;i<n;i++)P.push([cols>1?B[0]+(i%cols)*(B[1]-B[0])/(cols-1):(B[0]+B[1])/2,rows>1?B[2]+Math.floor(i/cols)*(B[3]-B[2])/(rows-1):(B[2]+B[3])/2]);
       return P;}
@@ -5465,18 +5575,21 @@ svg.map-on{pointer-events:none}
     function arrange(){
       if(job){job.finish();return;}                         /* segundo clic mientras calcula: termina con el mejor acomodo hasta ahora */
       stop();setSel(null);cancelArr();
-      var ids=Object.keys(cs),n=ids.length;if(n<2)return;
+      var ids=Object.keys(cs).filter(function(k){return !hid(cs[k]);}),n=ids.length;if(n<2)return;     /* con un tipo marcado solo se acomoda lo que se ve (los ocultos se quedan donde están) */
       var idx={};ids.forEach(function(k,i){idx[k]=i;});
-      var Ed=[];ls.forEach(function(l){if(l.a.c!=null&&l.b.c!=null&&cs[l.a.c]&&cs[l.b.c]&&l.a.c!==l.b.c)Ed.push([idx[l.a.c],idx[l.b.c]]);});
+      var Ed=[],EL=[],Wt=[];ls.forEach(function(l){if(l.a.c!=null&&l.b.c!=null&&idx[l.a.c]!==undefined&&idx[l.b.c]!==undefined&&l.a.c!==l.b.c){Ed.push([idx[l.a.c],idx[l.b.c]]);EL.push(l);Wt.push(l.t==='m'?2:1);}});   /* Wt: "mucha" pesa más que "poca" */
       var vb=svg.viewBox.baseVal,ex=ext(),aL=RX+20,aR=vb.width-RX-20,aT=RY+20,aB=vb.height-RY-100,AW=aR-aL,AH=aB-aT;
       if(AW<100||AH<100)return;
       var D=2*R+14,s=Math.max(1,Math.sqrt(n*Math.pow(D*1.8,2)/(AW*AH)));
       var Wl=AW*s,Hl=AH*s,B=[R+4,Wl-R-4,R+4,Hl-R-4],work=null,eng=null,pol=null,seedP=null,pct=function(){return 0;},
-          cats=ids.map(function(q){return cs[q].cat||null;}),planar=null,exTried=false,anch=false;
+          cats=ids.map(function(q){return cs[q].cat||null;}),planar=null,exTried=false,anch=false,plan=null,redo=false,seed=null,exact,PS=null,att=0;
       function bb(P){var x0=1e18,x1=-1e18,y0=1e18,y1=-1e18;P.forEach(function(p){x0=Math.min(x0,p[0]);x1=Math.max(x1,p[0]);y0=Math.min(y0,p[1]);y1=Math.max(y1,p[1]);});return [x0,x1,y0,y1];}
-      function startPol(P,ex){var q=bb(P),sz=Math.max(q[1]-q[0],q[3]-q[2]),big=sz>3000;
-        pol=Polisher(P,Ed,D,ex?[q[0]-R,q[1]+R,q[2]-R,q[3]+R]:B,cats,big?Math.min(6000,2500+n*60):Math.min(3000,900+n*60),ex?Math.max(60,Math.min(400,sz/6)):0);}
-      function tryExact(){exTried=true;var X=planarLayout(n,Ed,D,AW,AH);if(!X)return false;startPol(X,true);return true;}   /* respaldo exacto: si la red es plana, SIEMPRE sale sin cruces */
+      function startPol(P,ex){var q=bb(P),sz=Math.max(q[1]-q[0],q[3]-q[2]),big=sz>2000||ex;     /* dibujo grande: además de pequeños ajustes, los espacios se acercan al centro de sus vecinos */
+        pol=Polisher(P,Ed,D,[q[0]-R-150,q[1]+R+150,q[2]-R-150,q[3]+R+150],cats,sz>3000?Math.min(6000,2500+n*60):Math.min(3000,900+n*60),big?Math.max(60,Math.min(400,sz/6)):0);}
+      /* red plana: el dibujo exacto es correcto pero enorme; se encoge a un tamaño razonable y el motor corrige los choques locales (es mucho más fácil que partir del azar) */
+      function startAttempt(){var Q=PS.seeds[att].map(function(p){return [p[0],p[1]];}),q=bb(Q);att++;
+        eng=Engine(Q,Ed,D,[q[0]-200,q[1]+200,q[2]-200,q[3]+200],{sig0:60,T0:12,cycles:4,budget:Math.min(4500,1800+n*55),minMs:300,stag:1500});}
+      function tryExact(){exTried=true;var X=exact?exact.map(function(p){return [p[0],p[1]];}):planarLayout(n,Ed,D,AW,AH);if(!X)return false;startPol(X,true);return true;}   /* respaldo exacto: si la red es plana, SIEMPRE sale sin cruces */
       if(userMoved){
         var P0=ids.map(function(q){return [cs[q].x,cs[q].y];}),x0=1e9,x1=-1e9,y0=1e9,y1=-1e9;
         userMoved=false;                                     /* respeta tu idea; el siguiente Acomodar seguido ya es el normal */
@@ -5491,16 +5604,25 @@ svg.map-on{pointer-events:none}
         var k=Math.sqrt(Wl*Hl/n)*0.9,nR=Math.max(20,Math.min(120,Math.round(3000/n))),r=0,bestQ=null,bc=1e18;
         work=function(sl){var t0=performance.now(),Q,j,c;
           if(pol){pol.run(Math.max(2,sl-(performance.now()-t0)));return pol.done();}
-          if(planar===null)planar=!!lrEmbed(n,Ed);            /* ¿se puede sin cruces? (milisegundos) */
+          if(planar===null){planar=!!lrEmbed(n,Ed);            /* ¿se puede sin cruces? (milisegundos) */
+            if(!planar&&!anch){                                  /* red NO plana: se calcula cuántos espacios hacen falta para quitar todos los cruces */
+              plan=planarize(n,Ed,Wt,D,AW,AH,1000);
+              if(plan&&plan.k>0&&window.confirm(msgPlan())){redo=true;return true;}
+              seed=planarSeed(n,Ed,Wt,D,AW,AH,1100);             /* si no, se parte de un dibujo plano al que se le agregan las relaciones que sobran */
+              if(seed){seed=seed.map(function(p){return [p[0],p[1]];});bestQ=seed;r=nR;}}}
+          if(planar&&!anch&&!eng&&exact===undefined){PS=planarSeeds(n,Ed,D,AW,AH,400);exact=PS?PS.small:null;if(!PS||!PS.seeds.length)exact=null;}
+          if(planar&&exact&&!eng)startAttempt();
           while(!eng){
-            if(r>=nR){eng=Engine(bestQ,Ed,D,B,{sig0:170,T0:40,cycles:planar?3:5,stag:planar?0:Math.max(4000,n*150),budget:planar?Math.min(1800,900+n*25):Math.min(25000,4000+n*350+Ed.length*40),minMs:600});break;}
+            if(r>=nR){if(seed){var sb=bb(seed);eng=Engine(bestQ,Ed,D,[sb[0]-300,sb[1]+300,sb[2]-300,sb[3]+300],{sig0:70,T0:14,cycles:3,stag:3500,budget:Math.min(12000,4000+n*200),minMs:600});}
+              else eng=Engine(bestQ,Ed,D,B,{sig0:170,T0:40,cycles:planar?3:5,stag:planar?0:Math.max(4000,n*150),budget:planar?Math.min(1800,900+n*25):Math.min(25000,4000+n*350+Ed.length*40),minMs:600});break;}
             Q=[];for(j=0;j<n;j++)Q.push([rnd(B[0],B[1]),rnd(B[2],B[3])]);
             fr(Q,Ed,k,B,Math.min(Wl,Hl)/6);c=cost(Q,Ed,D);if(c<bc){bc=c;bestQ=Q;}r++;
             if(performance.now()-t0>sl)return false;}
           eng.run(Math.max(2,sl-(performance.now()-t0)));
           if(!eng.done())return false;
           if(eng.viol()===0){startPol(eng.best().map(function(p){return [p[0],p[1]];}),false);return false;}
-          if(planar&&!exTried&&tryExact())return false;     /* el acomodo al azar no lo logró pero la red SÍ es plana: método exacto */
+          if(planar&&exact&&att<PS.seeds.length){eng=null;startAttempt();return false;}                /* otro intento con otra escala */
+          if(planar&&!exTried&&tryExact())return false;     /* no lo logró pero la red SÍ es plana: método exacto (siempre sin cruces) */
           return true;};                                      /* red no plana: se queda con el mínimo de cruces */
         pct=function(){return pol?0.5+0.5*pol.prog():(eng?0.04+0.46*eng.prog():0.04*r/nR);};   /* 0-50 % busca sin cruces, 50-100 % pule */
       }
@@ -5509,6 +5631,18 @@ svg.map-on{pointer-events:none}
           eng.run(sl);if(!eng.done())return false;
           if(eng.viol()>0&&!exTried&&lrEmbed(n,Ed)&&tryExact())return false;    /* tus movimientos no bastaron: si es plana, se acomoda con el método exacto */
           return true;};pct=function(){return pol?0.5+0.5*pol.prog():eng.prog()*0.5;};}
+      function msgPlan(){var k=plan.k,dr=plan.drop||[],nm=function(e){return cs[ids[Ed[e][0]]].name+' – '+cs[ids[Ed[e][1]]].name;};
+        return 'Esta red no se puede dibujar sin cruces con líneas rectas (no es plana).\n\nPara quitar los cruces hay que crear '+k+' espacio'+(k>1?'s':'')+' nuevo'+(k>1?'s':'')+', uno en cada cruce.'
+          +(dr.length&&dr.length<k?'\n\nOtra opción: si quitas '+dr.length+' relacion'+(dr.length>1?'es':'')+' ('+dr.slice(0,6).map(nm).join('; ')+(dr.length>6?'…':'')+'), la red queda plana sin crear nada.':'')
+          +'\n\nAceptar: crea los espacios y acomoda sin cruces.\nCancelar: acomoda dejando el mínimo de cruces.';}
+      function applyPlan(pl){var dc={};                         /* cada relación que se cruzaba pasa por espacios nuevos, uno por cruce */
+        pl.chains.forEach(function(ch){var vs=ch.v,l0=EL[ch.es[0]],A=cs[ids[vs[0]]],Z=cs[ids[vs[vs.length-1]]],cid=[],i,t,o;
+          if(!l0||!A||!Z)return;t=l0.t;o=l0.doff;
+          for(i=0;i<vs.length;i++){var x=vs[i];
+            if(x<n)cid.push(cs[ids[x]].id);
+            else{if(dc[x]===undefined){var f=i/(vs.length-1),c=addCircle(A.x+(Z.x-A.x)*f,A.y+(Z.y-A.y)*f,'Espacio');dc[x]=c.id;}cid.push(dc[x]);}}
+          ch.es.forEach(function(e){var l=EL[e];if(l&&ls.indexOf(l)>=0){gl.removeChild(l.g);ls.splice(ls.indexOf(l),1);}});
+          for(i=0;i<cid.length-1;i++)addLine({c:cid[i]},{c:cid[i+1]},t,o);});}
       function result(){var P=seedP||(pol?pol.best():eng.best());return separate(P.map(function(p){return [p[0],p[1]];}),D);}
       function commit(P){
         if(!ids.every(function(q){return cs[q];}))return;      /* mientras calculaba se borró o cargó otro caso */
@@ -5526,13 +5660,12 @@ svg.map-on{pointer-events:none}
         function step(now){var f=Math.min(1,(now-t0)/dur);paintAt(f);if(f<1)arrAnim=requestAnimationFrame(step);else{arrAnim=0;arrFin=null;}}
         arrAnim=requestAnimationFrame(step);}
       if(!work){commit(result());return;}
-      var J=job={tm:0,finish:function(){clearTimeout(J.tm);job=null;hideBar();if(eng)eng.stopNow();
+      var J=job={tm:0,finish:function(){clearTimeout(J.tm);job=null;hideBar();
+          if(redo){applyPlan(plan);setTimeout(arrange,0);return;}                      /* aceptaste crear los espacios: se crean y se acomoda de nuevo (ya es plana) */
+          if(eng)eng.stopNow();
           if(!pol&&eng&&eng.viol()>0&&!exTried&&(planar||(planar===null&&lrEmbed(n,Ed))))tryExact();   /* "terminar ya" antes de lograrlo: se usa el método exacto, que es instantáneo */
           if(pol)pol.stopNow();
-          var P=result(),nx=countX(P,Ed);
-          if(nx>0&&!anch&&!planar&&window.confirm('Esta red no se puede dibujar sin cruces con líneas rectas (no es plana). El mejor acomodo deja '+nx+' cruce'+(nx>1?'s':'')+'.\n\n¿Quieres que cree un espacio en cada cruce para dejarlo sin cruces?\n\nAceptar: crea los espacios y acomoda de nuevo.\nCancelar: deja el acomodo con los cruces.')){
-            ids.forEach(function(q,i){cs[q].x=P[i][0];cs[q].y=P[i][1];place(cs[q]);});ls.forEach(function(l){lay(l);});
-            planarizeAll();setTimeout(arrange,0);return;}
+          var P=result();
           commit(P);}};
       function tick(){if(job!==J)return;
         var done=work(14);
