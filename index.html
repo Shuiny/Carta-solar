@@ -5065,6 +5065,16 @@ svg.map-on{pointer-events:none}
         gl.removeChild(l.g);ls.splice(ls.indexOf(l),1);
         addLine({c:a},{c:c.id},t,o);addLine({c:c.id},{c:b},t,o);});
       setSel(null);edit(c,true);}
+    /* todos los cruces de golpe (misma idea que el doble clic, sin abrir la edición de cada espacio) */
+    function planarizeAll(){var g,A,B,i,j,x,hit;
+      for(g=0;g<300;g++){hit=null;
+        for(i=0;i<ls.length&&!hit;i++){A=ls[i];if(A.a.c==null||A.b.c==null||!cs[A.a.c]||!cs[A.b.c])continue;
+          for(j=i+1;j<ls.length;j++){B=ls[j];if(B.a.c==null||B.b.c==null||!cs[B.a.c]||!cs[B.b.c])continue;
+            if(A.a.c===B.a.c||A.a.c===B.b.c||A.b.c===B.a.c||A.b.c===B.b.c)continue;
+            x=segHit(ep(A.a,A.b),ep(A.b,A.a),ep(B.a,B.b),ep(B.b,B.a));if(x){hit={x:x[0],y:x[1],A:A,B:B};break;}}}
+        if(!hit)break;
+        var c=addCircle(hit.x,hit.y,'Espacio');
+        [hit.A,hit.B].forEach(function(l){var a=l.a.c,b=l.b.c,t=l.t,o=l.doff;gl.removeChild(l.g);ls.splice(ls.indexOf(l),1);addLine({c:a},{c:c.id},t,o);addLine({c:c.id},{c:b},t,o);});}}
     function up(ev){
       var had=!!ptrs[ev.pointerId];delete ptrs[ev.pointerId];if(!had)return;
       if(pinch){if(Object.keys(ptrs).length<2)pinch=null;drag=null;return;}
@@ -5120,7 +5130,7 @@ svg.map-on{pointer-events:none}
     fin.addEventListener('change',function(){var f=fin.files&&fin.files[0];fin.value='';if(!f)return;
       var r=new FileReader();r.onload=function(){try{setState(JSON.parse(r.result));}catch(e){window.alert('No se pudo cargar: el archivo no es un caso de diagramas válido.');}};r.readAsText(f);});
 
-    /* ---- Acomodar: busca el acomodo con menos cruces (reinicios aleatorios + fuerzas + recocido simulado) ---- */
+    /* ---- Acomodar: busca el acomodo con menos cruces (reinicios aleatorios + fuerzas + recocido simulado) y después lo pule (largos parejos, aire, zonas por tipo) sin permitir ningún cruce nuevo; si la red es plana y no sale al azar, usa el método exacto (siempre sin cruces) ---- */
     /*ARR-START*/
     function segX(p,q,r,s){function o(a,b,c){return (b[0]-a[0])*(c[1]-a[1])-(b[1]-a[1])*(c[0]-a[0]);}
       var d1=o(r,s,p),d2=o(r,s,q),d3=o(p,q,r),d4=o(p,q,s);
@@ -5167,11 +5177,11 @@ svg.map-on{pointer-events:none}
         if(!moved)break;}
       return P;}
     function Engine(P,Ed,D,B,o){
-      var n=P.length,inc=mkAdj(n,Ed),P0=o.P0||null,W=o.W||0,budget=o.budget,minMs=o.minMs||0,sig0=o.sig0,T0=o.T0,ncyc=o.cycles||4,
-          cyc=budget/ncyc,cn=0,el=0,cycEl=0,fin=false;
+      var n=P.length,inc=mkAdj(n,Ed),P0=o.P0||null,W=o.W||0,budget=o.budget,minMs=o.minMs||0,sig0=o.sig0,T0=o.T0,ncyc=o.cycles||4,stag=o.stag||0,
+          cyc=budget/ncyc,cn=0,el=0,cycEl=0,fin=false,lastImp=0;
       function copy(){return P.map(function(p){return [p[0],p[1]];});}
       function total(){var c=cost(P,Ed,D),q;if(P0)for(q=0;q<n;q++)c+=W*Math.hypot(P[q][0]-P0[q][0],P[q][1]-P0[q][1]);return c;}
-      var cur=total(),V=VIOL,best=copy(),bc=cur,bV=V;
+      var cur=total(),V=VIOL,best=copy(),bc=cur,bV=V,bVmin=V;
       function run(sl){var t0=performance.now(),last=t0,now,q,i,ox,oy,b4,v4,dc,f,T,sig,k;
         while(!fin){
           f=cycEl/cyc;T=T0*Math.pow(.55,cn)*(1-f)+0.4;sig=Math.max(12,sig0*Math.pow(.8,cn)*(1-f));
@@ -5182,15 +5192,253 @@ svg.map-on{pointer-events:none}
             else{P[i][0]=cl(ox+gauss()*sig,B[0],B[1]);P[i][1]=cl(oy+gauss()*sig,B[2],B[3]);}
             dc=contrib(i,P,Ed,inc,D,P0,W)-b4;
             if(dc<=0||Math.random()<Math.exp(-dc/T)){cur+=dc;V+=CV-v4;
-              if(cur<bc-1e-9){bc=cur;bV=V;for(k=0;k<n;k++){best[k][0]=P[k][0];best[k][1]=P[k][1];}}}
+              if(cur<bc-1e-9){bc=cur;bV=V;if(V<bVmin){bVmin=V;lastImp=el;}for(k=0;k<n;k++){best[k][0]=P[k][0];best[k][1]=P[k][1];}}}
             else{P[i][0]=ox;P[i][1]=oy;}}
           now=performance.now();el+=now-last;cycEl+=now-last;last=now;
           if(bV<=0&&el>minMs){fin=true;break;}
+          if(stag&&bV>0&&el-lastImp>stag&&el>minMs){fin=true;break;}   /* sin mejora en mucho rato: es casi seguro que no se puede sin cruces; se queda con el mínimo */
           if(cycEl>=cyc){cn++;cycEl=0;if(cn>=ncyc||el>=budget){fin=true;break;}
             for(k=0;k<n;k++){P[k][0]=best[k][0];P[k][1]=best[k][1];}cur=total();V=VIOL;bc=cur;bV=V;}
           if(now-t0>sl)break;}
         return fin;}
       return {run:run,done:function(){return fin;},best:function(){return best;},viol:function(){return bV;},prog:function(){return Math.min(1,el/budget);},stopNow:function(){fin=true;}};}
+    /* ---- Pulido: ya sin cruces ni encimes, mejora lo estético sin permitir NI UN cruce nuevo ----
+       Relaciones de largo parejo (ni pegadas ni estiradas), aire entre espacios, líneas lejos de burbujas ajenas y espacios del mismo tipo agrupados (zonas). */
+    function bcontrib(i,P,Ed,inc,D,cats,L){
+      var n=P.length,m=Ed.length,c=0,pi=P[i],ie=inc[i],ci=cats[i],CL=R+22,j,k,f,e,b,dx,dy,d,s;
+      for(j=0;j<n;j++){if(j===i)continue;dx=pi[0]-P[j][0];dy=pi[1]-P[j][1];d=Math.sqrt(dx*dx+dy*dy);
+        if(d<D+34)c+=0.9*(D+34-d);
+        if(ci&&ci===cats[j])c+=0.04*d;}
+      for(k=0;k<ie.length;k++){e=Ed[ie[k]];dx=P[e[0]][0]-P[e[1]][0];dy=P[e[0]][1]-P[e[1]][1];d=Math.sqrt(dx*dx+dy*dy);
+        c+=d>L?0.5*(d-L):0.25*(L-d);
+        for(j=0;j<n;j++){if(j===e[0]||j===e[1])continue;s=segPt(P[e[0]],P[e[1]],P[j]);if(s<CL)c+=1.4*(CL-s);}}
+      for(f=0;f<m;f++){b=Ed[f];if(b[0]===i||b[1]===i)continue;s=segPt(P[b[0]],P[b[1]],pi);if(s<CL)c+=1.4*(CL-s);}
+      return c;}
+    function Polisher(P,Ed,D,B,cats,budget,sg0){
+      var n=P.length,inc=mkAdj(n,Ed),L=D+50,el=0,fin=false,best=P.map(function(p){return [p[0],p[1]];});
+      cost(P,Ed,D);if(VIOL>0||n<2)fin=true;                  /* solo se pule lo que ya está limpio */
+      var cur=0,bc=0;
+      function run(sl){var t0=performance.now(),last=t0,now,q,i,ox,oy,b4,v4,dc,f,T,sig,k;
+        while(!fin){
+          f=Math.min(1,el/budget);T=10*Math.pow(1-f,2)+0.15;sig=Math.max(5,(sg0||45)*Math.pow(1-f,1.5)+5);
+          for(q=0;q<48;q++){
+            i=Math.floor(Math.random()*n);ox=P[i][0];oy=P[i][1];
+            contrib(i,P,Ed,inc,D,null,0);v4=CV;b4=bcontrib(i,P,Ed,inc,D,cats,L);
+            if(sg0&&inc[i].length&&Math.random()<0.5*(1-f)+0.1){       /* dibujo grande: acercarse al centro de los vecinos (una fracción al azar) */
+              var cx=0,cy=0,ee,oo,tf=0.15+0.85*Math.random();
+              for(k=0;k<inc[i].length;k++){ee=Ed[inc[i][k]];oo=ee[0]===i?ee[1]:ee[0];cx+=P[oo][0];cy+=P[oo][1];}
+              P[i][0]=cl(ox+(cx/inc[i].length-ox)*tf,B[0],B[1]);P[i][1]=cl(oy+(cy/inc[i].length-oy)*tf,B[2],B[3]);}
+            else{P[i][0]=cl(ox+gauss()*sig,B[0],B[1]);P[i][1]=cl(oy+gauss()*sig,B[2],B[3]);}
+            contrib(i,P,Ed,inc,D,null,0);
+            if(CV>v4){P[i][0]=ox;P[i][1]=oy;continue;}      /* jamás un cruce, un encime o una línea sobre otra burbuja nuevos */
+            dc=bcontrib(i,P,Ed,inc,D,cats,L)-b4;
+            if(dc<=0||Math.random()<Math.exp(-dc/T)){cur+=dc;
+              if(cur<bc-1e-9){bc=cur;for(k=0;k<n;k++){best[k][0]=P[k][0];best[k][1]=P[k][1];}}}
+            else{P[i][0]=ox;P[i][1]=oy;}}
+          now=performance.now();el+=now-last;last=now;
+          if(el>=budget){fin=true;break;}
+          if(now-t0>sl)break;}
+        return fin;}
+      return {run:run,done:function(){return fin;},best:function(){return best;},prog:function(){return Math.min(1,el/budget);},stopNow:function(){fin=true;}};}
+    /* ---- Planaridad exacta ----
+       1) Prueba LR (Brandes): dice si la red SE PUEDE dibujar sin cruces y da el orden cíclico de las relaciones en cada espacio.
+       2) Dibujo con rectas (Tutte): con ese orden, el dibujo sale SIN cruces garantizado; después se escala para que ningún espacio quede encima ni una línea pase sobre otro. */
+    function lrEmbed(n,Ed){
+      var adjs=[],seen={},m=0,i,j,t;
+      for(i=0;i<n;i++)adjs.push([]);
+      Ed.forEach(function(e){var a=e[0],b=e[1],k=a<b?a*n+b:b*n+a;if(a===b||seen[k])return;seen[k]=1;m++;adjs[a].push(b);adjs[b].push(a);});
+      if(n>2&&m>3*n-6)return null;
+      adjs.forEach(function(l){for(j=l.length-1;j>0;j--){i=Math.floor(Math.random()*(j+1));t=l[j];l[j]=l[i];l[i]=t;}});   /* orden al azar: cada clic puede dar otro acomodo */
+      var height=[],roots=[],lowpt={},lowpt2={},nest={},parentE=[],inDG={},DGo=[],ref={},side={},S=[],sb={},lowE={},lref=[],rref=[],ordered=[],hc=[],cwM=[],ccwM=[],lm=[];
+      for(i=0;i<n;i++){height.push(null);parentE.push(-1);DGo.push([]);hc.push(0);cwM.push({});ccwM.push({});lm.push(-1);}
+      function K(a,b){return a*n+b;}
+      function sideOf(k){return side[k]===undefined?1:side[k];}
+      function top(){return S.length?S[S.length-1]:null;}
+      function emp(I){return I.low===null&&I.high===null;}
+      function cpI(I){return {low:I.low,high:I.high};}
+      function conf(I,b){return !emp(I)&&lowpt[I.high]>lowpt[b];}
+      function swp(P){var q=P.left;P.left=P.right;P.right=q;}
+      function lowest(P){if(emp(P.left))return lowpt[P.right.low];if(emp(P.right))return lowpt[P.left.low];return Math.min(lowpt[P.left.low],lowpt[P.right.low]);}
+      function rf(k){var r=ref[k];return r===undefined?null:r;}
+      function orient(root){var stack=[root],ind=[],skip={},v,e,w,vw,adj,q;for(q=0;q<n;q++)ind.push(0);
+        while(stack.length){v=stack.pop();e=parentE[v];adj=adjs[v];
+          for(var ii=ind[v];ii<adj.length;ii++){w=adj[ii];vw=K(v,w);
+            if(!skip[vw]){
+              if(inDG[vw]||inDG[K(w,v)]){ind[v]++;continue;}
+              inDG[vw]=1;DGo[v].push(w);lowpt[vw]=height[v];lowpt2[vw]=height[v];
+              if(height[w]===null){parentE[w]=vw;height[w]=height[v]+1;stack.push(v);stack.push(w);skip[vw]=1;break;}
+              else lowpt[vw]=height[w];}
+            nest[vw]=2*lowpt[vw];if(lowpt2[vw]<height[v])nest[vw]+=1;
+            if(e!==-1){if(lowpt[vw]<lowpt[e]){lowpt2[e]=Math.min(lowpt[e],lowpt2[vw]);lowpt[e]=lowpt[vw];}
+              else if(lowpt[vw]>lowpt[e]){lowpt2[e]=Math.min(lowpt2[e],lowpt[vw]);}
+              else{lowpt2[e]=Math.min(lowpt2[e],lowpt2[vw]);}}
+            ind[v]++;}}}
+      function addC(ei,e){var P={left:{low:null,high:null},right:{low:null,high:null}},Q,t;
+        do{Q=S.pop();if(!emp(Q.left))swp(Q);if(!emp(Q.left))return false;
+          if(lowpt[Q.right.low]>lowpt[e]){if(emp(P.right))P.right=cpI(Q.right);else ref[P.right.low]=Q.right.high;P.right.low=Q.right.low;}
+          else ref[Q.right.low]=lowE[e];
+        }while(top()!==sb[ei]);
+        while((t=top())&&(conf(t.left,ei)||conf(t.right,ei))){Q=S.pop();if(conf(Q.right,ei))swp(Q);if(conf(Q.right,ei))return false;
+          ref[P.right.low]=Q.right.high;if(Q.right.low!==null)P.right.low=Q.right.low;
+          if(emp(P.left))P.left=cpI(Q.left);else ref[P.left.low]=Q.left.high;P.left.low=Q.left.low;}
+        if(!(emp(P.left)&&emp(P.right)))S.push(P);
+        return true;}
+      function removeBack(e){var u=Math.floor(e/n),P,t,hl,hr;
+        while(S.length&&lowest(top())===height[u]){P=S.pop();if(P.left.low!==null)side[P.left.low]=-1;}
+        if(S.length){P=S.pop();
+          while(P.left.high!==null&&P.left.high%n===u)P.left.high=rf(P.left.high);
+          if(P.left.high===null&&P.left.low!==null){ref[P.left.low]=P.right.low;side[P.left.low]=-1;P.left.low=null;}
+          while(P.right.high!==null&&P.right.high%n===u)P.right.high=rf(P.right.high);
+          if(P.right.high===null&&P.right.low!==null){ref[P.right.low]=P.left.low;side[P.right.low]=-1;P.right.low=null;}
+          S.push(P);}
+        if(lowpt[e]<height[u]){t=top();hl=t?t.left.high:null;hr=t?t.right.high:null;
+          if(hl!==null&&(hr===null||lowpt[hl]>lowpt[hr]))ref[e]=hl;else ref[e]=hr;}}
+      function testing(root){var stack=[root],ind=[],skip={},v,e,w,ei,oa,skipFinal,q;for(q=0;q<n;q++)ind.push(0);
+        while(stack.length){v=stack.pop();e=parentE[v];skipFinal=false;oa=ordered[v];
+          for(var ii=ind[v];ii<oa.length;ii++){w=oa[ii];ei=K(v,w);
+            if(!skip[ei]){sb[ei]=top();
+              if(ei===parentE[w]){stack.push(v);stack.push(w);skip[ei]=1;skipFinal=true;break;}
+              else{lowE[ei]=ei;S.push({left:{low:null,high:null},right:{low:ei,high:ei}});}}
+            if(lowpt[ei]<height[v]){
+              if(w===oa[0])lowE[e]=lowE[ei];
+              else if(!addC(ei,e))return false;}
+            ind[v]++;}
+          if(!skipFinal&&e!==-1)removeBack(e);}
+        return true;}
+      function sign(e0){var stack=[e0],old={},e,r;
+        while(stack.length){e=stack.pop();r=rf(e);
+          if(r!==null){stack.push(e);stack.push(r);old[e]=r;ref[e]=null;}
+          else side[e]=sideOf(e)*(old[e]===undefined?1:sideOf(old[e]));}
+        return sideOf(e0);}
+      function addHE(s,t,cwr,ccwr){
+        if(hc[s]===0){cwM[s][t]=t;ccwM[s][t]=t;lm[s]=t;hc[s]=1;return;}
+        var C=cwM[s],A=ccwM[s],rc,rw;
+        if(cwr>=0){rc=A[cwr];C[t]=cwr;A[t]=rc;C[rc]=t;A[cwr]=t;if(cwr===lm[s])lm[s]=t;}
+        else{rw=C[ccwr];C[t]=rw;A[t]=ccwr;A[rw]=t;C[ccwr]=t;}
+        hc[s]++;}
+      var rs=[];for(i=0;i<n;i++)rs.push(i);
+      for(j=rs.length-1;j>0;j--){i=Math.floor(Math.random()*(j+1));t=rs[j];rs[j]=rs[i];rs[i]=t;}
+      rs.forEach(function(v){if(height[v]===null){height[v]=0;roots.push(v);orient(v);}});
+      for(i=0;i<n;i++)ordered[i]=DGo[i].slice().sort(function(a,b){return nest[K(i,a)]-nest[K(i,b)];});
+      for(i=0;i<roots.length;i++)if(!testing(roots[i]))return null;
+      for(i=0;i<n;i++)DGo[i].forEach(function(w){var e=K(i,w);nest[e]=sign(e)*nest[e];});
+      for(i=0;i<n;i++){ordered[i]=DGo[i].slice().sort(function(a,b){return nest[K(i,a)]-nest[K(i,b)];});
+        var prev=-1;ordered[i].forEach(function(w){addHE(i,w,-1,prev);prev=w;});}
+      roots.forEach(function(root){var stack=[root],ind=[],v,w,ei,oa,q;for(q=0;q<n;q++)ind.push(0);
+        while(stack.length){v=stack.pop();oa=ordered[v];
+          for(var ii=ind[v];ii<oa.length;ii++){w=oa[ii];ind[v]++;ei=K(v,w);
+            if(ei===parentE[w]){addHE(w,v,lm[w],-1);lref[v]=w;rref[v]=w;stack.push(v);stack.push(w);break;}
+            else{if(sideOf(ei)===1)addHE(w,v,-1,rref[w]);else{addHE(w,v,lref[w],-1);lref[w]=v;}}}}});
+      var rot=[];
+      for(i=0;i<n;i++){var arr=[];if(hc[i]){var x0=lm[i],x=x0;do{arr.push(x);x=ccwM[i][x];}while(x!==x0&&arr.length<=hc[i]);}rot.push(arr);}
+      return rot;}
+    /* caras de un orden cíclico: la siguiente semiarista de (a->b) es (b->vecino que sigue a "a" en b) */
+    function rotFaces(rot){var n=rot.length,pos=[],seen={},F=[],v,u,i,a,b,f,x;
+      for(v=0;v<n;v++){var p={};rot[v].forEach(function(w,j){p[w]=j;});pos.push(p);}
+      for(v=0;v<n;v++)for(i=0;i<rot[v].length;i++){u=rot[v][i];if(seen[v*n+u])continue;
+        f=[];a=v;b=u;
+        do{seen[a*n+b]=1;f.push(a);x=rot[b][(pos[b][a]+1)%rot[b].length];a=b;b=x;}while(!(a===v&&b===u)&&f.length<=4*n*n);
+        F.push(f);}
+      return F;}
+    function blockMap(R2){var nl=R2.length,disc=[],low=[],t=0,es=[],bm={},bid=0,i;
+      for(i=0;i<nl;i++){disc.push(0);low.push(0);}
+      function dfs(u,p){disc[u]=low[u]=++t;
+        R2[u].forEach(function(w){if(w===p)return;
+          if(!disc[w]){es.push([u,w]);dfs(w,u);low[u]=Math.min(low[u],low[w]);
+            if(low[w]>=disc[u]){var e;do{e=es.pop();bm[e[0]*nl+e[1]]=bid;bm[e[1]*nl+e[0]]=bid;}while(!(e[0]===u&&e[1]===w));bid++;}}
+          else if(disc[w]<disc[u]){es.push([u,w]);low[u]=Math.min(low[u],disc[w]);}});}
+      dfs(0,-1);return {bm:bm,count:bid};}
+    function solveLin(A,b1,b2){var N=b1.length,i,j,k,p,t,f;
+      for(i=0;i<N;i++){p=i;for(j=i+1;j<N;j++)if(Math.abs(A[j][i])>Math.abs(A[p][i]))p=j;
+        if(Math.abs(A[p][i])<1e-12)return null;
+        if(p!==i){t=A[i];A[i]=A[p];A[p]=t;t=b1[i];b1[i]=b1[p];b1[p]=t;t=b2[i];b2[i]=b2[p];b2[p]=t;}
+        for(j=i+1;j<N;j++){f=A[j][i]/A[i][i];if(!f)continue;for(k=i;k<N;k++)A[j][k]-=f*A[i][k];b1[j]-=f*b1[i];b2[j]-=f*b2[i];}}
+      for(i=N-1;i>=0;i--){t=b1[i];f=b2[i];for(j=i+1;j<N;j++){t-=A[i][j]*b1[j];f-=A[i][j]*b2[j];}b1[i]=t/A[i][i];b2[i]=f/A[i][i];}
+      return true;}
+    /* un componente conexo (>=3 espacios): lo vuelve biconexo con aristas auxiliares, tria las caras, fija la cara exterior en un círculo y reparte el resto por promedios (Tutte) */
+    function drawComp(R2,oe,D){
+      var nl=R2.length,i,j,v,u,w,deg,x,y;
+      if(nl===3){return [[0,0],[1,0],[0.5,Math.sqrt(3)/2]];}
+      var B=blockMap(R2),bm=B.bm,par=[];for(i=0;i<B.count;i++)par.push(i);
+      function fnd(a){while(par[a]!==a){par[a]=par[par[a]];a=par[a];}return a;}
+      function blk(a,b){return fnd(bm[a*nl+b]);}
+      for(var guard=0;guard<20*nl+50;guard++){var done=true;
+        outer:for(v=0;v<nl;v++){deg=R2[v].length;if(deg<2)continue;
+          for(i=0;i<deg;i++){u=R2[v][i];w=R2[v][(i+1)%deg];if(u===w)continue;
+            if(blk(v,u)!==blk(v,w)){
+              j=R2[u].indexOf(v);R2[u].splice(j,0,w);                 /* w justo antes de v en u */
+              j=R2[w].indexOf(v);R2[w].splice(j+1,0,u);               /* u justo después de v en w */
+              var id=blk(v,u);par[blk(v,w)]=id;bm[u*nl+w]=id;bm[w*nl+u]=id;done=false;break outer;}}}
+        if(done)break;}
+      var chk={};for(var key in bm)chk[fnd(bm[key])]=1;if(Object.keys(chk).length!==1)return null;
+      var F=rotFaces(R2),mx=0;F.forEach(function(f){mx=Math.max(mx,f.length);});
+      var cand=F.filter(function(f){return f.length>=Math.max(3,Math.ceil(mx*0.7));}),out=cand[Math.floor(Math.random()*cand.length)],k=out.length;
+      var adjT=[],NV=nl,fixed={};
+      for(i=0;i<nl;i++)adjT.push(R2[i].slice());
+      out.forEach(function(q,t){fixed[q]=[Math.cos(2*Math.PI*t/k),Math.sin(2*Math.PI*t/k)];});
+      var cen=[];
+      F.forEach(function(f){if(f===out)return;var c=NV++;adjT[c]=f.slice();f.forEach(function(q){adjT[q].push(c);});cen.push({c:c,f:f});});   /* cada cara interior lleva un punto auxiliar: nadie queda con solo 2 vecinos */
+      var inner=[],ix={};for(i=0;i<NV;i++)if(!fixed[i]){ix[i]=inner.length;inner.push(i);}
+      var N=inner.length,X=new Array(NV),Y=new Array(NV),wt={};
+      for(i=0;i<nl;i++)if(fixed[i]){X[i]=fixed[i][0];Y[i]=fixed[i][1];}
+      /* Tutte con pesos: con CUALQUIER peso positivo el dibujo sigue sin cruces. Se reajustan los pesos (largo de cada línea) para repartir y que nada quede apretado */
+      function wk(a,b){return wt[a<b?a*NV+b:b*NV+a]||1;}
+      function tutteSolve(){
+        if(!N)return true;
+        var A=[],b1=[],b2=[];
+        inner.forEach(function(q,r){var row=new Float64Array(N),sx=0,sy=0,sw=0;
+          adjT[q].forEach(function(z){var w=wk(q,z);sw+=w;if(fixed[z]){sx+=w*fixed[z][0];sy+=w*fixed[z][1];}else row[ix[z]]-=w;});
+          row[r]=sw;A.push(row);b1.push(sx);b2.push(sy);});
+        if(!solveLin(A,b1,b2))return false;
+        inner.forEach(function(q,r){X[q]=b1[r];Y[q]=b2[r];});return true;}
+      if(!tutteSolve())return null;
+      for(var rw=0;rw<28&&N;rw++){
+        var ml=0,mn=1e18;
+        for(i=0;i<NV;i++)adjT[i].forEach(function(z){if(z>i){var l=Math.hypot(X[i]-X[z],Y[i]-Y[z])+1e-12;wt[i*NV+z]=l;ml+=l;mn=Math.min(mn,l);}});
+        if(!tutteSolve())return null;}
+      var P=[];for(i=0;i<nl;i++)P.push([X[i],Y[i]]);
+      return P;}
+    /* dibujo sin cruces de toda la red (o null si no es plana). Devuelve posiciones ya con el espacio suficiente */
+    function planarOnce(n,Ed,D,AW,AH){
+      var rot=lrEmbed(n,Ed);if(!rot)return null;
+      var comp=[],cid=[],i,q,s,v;for(i=0;i<n;i++)cid.push(-1);
+      for(i=0;i<n;i++){if(cid[i]>=0)continue;var c=[],st=[i];cid[i]=comp.length;
+        while(st.length){v=st.pop();c.push(v);rot[v].forEach(function(w){if(cid[w]<0){cid[w]=comp.length;st.push(w);}});}
+        comp.push(c);}
+      var isE={};Ed.forEach(function(e){isE[e[0]*n+e[1]]=1;isE[e[1]*n+e[0]]=1;});
+      var boxes=[];
+      for(var ci=0;ci<comp.length;ci++){var cv=comp[ci],nl=cv.length,loc={},P;cv.forEach(function(g,t){loc[g]=t;});
+        if(nl===1)P=[[0,0]];
+        else if(nl===2)P=[[0,0],[D+60,0]];
+        else{var R2=cv.map(function(g){return rot[g].map(function(z){return loc[z];});}),oe=[];
+          cv.forEach(function(g,a){rot[g].forEach(function(z){if(loc[z]>a)oe.push([a,loc[z]]);});});
+          P=drawComp(R2,oe,D);if(!P)return null;
+          var dp=1e18,dv=1e18,a,b,d;
+          for(a=0;a<nl;a++)for(b=a+1;b<nl;b++){d=Math.hypot(P[a][0]-P[b][0],P[a][1]-P[b][1]);if(d<dp)dp=d;}
+          oe.forEach(function(e){for(a=0;a<nl;a++){if(a===e[0]||a===e[1])continue;d=segPt(P[e[0]],P[e[1]],P[a]);if(d<dv)dv=d;}});
+          s=Math.max((D+8)/dp,(R+14)/dv)*1.03;if(!isFinite(s))return null;
+          P=P.map(function(p){return [p[0]*s,p[1]*s];});                                   /* escala mínima que ya cumple todo (el Polisher lo compacta después) */}
+        var x0=1e18,x1=-1e18,y0=1e18,y1=-1e18;P.forEach(function(p){x0=Math.min(x0,p[0]);x1=Math.max(x1,p[0]);y0=Math.min(y0,p[1]);y1=Math.max(y1,p[1]);});
+        boxes.push({cv:cv,P:P.map(function(p){return [p[0]-x0,p[1]-y0];}),w:x1-x0,h:y1-y0});}
+      /* componentes sueltos: se acomodan en filas, separados lo suficiente para que nada se toque */
+      var gap=D+30,order=boxes.slice().sort(function(a,b){return b.h-a.h;}),area=0;
+      order.forEach(function(b){area+=(b.w+gap)*(b.h+gap);});
+      var Wt=Math.max(order[0].w,Math.sqrt(area*(AW/AH))),rx=0,ry=0,rh=0,res=new Array(n);
+      order.forEach(function(b){if(rx>0&&rx+b.w>Wt){rx=0;ry+=rh+gap;rh=0;}
+        b.cv.forEach(function(g,t){res[g]=[b.P[t][0]+rx+R+4,b.P[t][1]+ry+R+4];});rx+=b.w+gap;rh=Math.max(rh,b.h);});
+      cost(res,Ed,D);if(VIOL>0)return null;                                             /* comprobación final: si algo falló, no se usa */
+      return res;}
+    /* cada intento tarda milisegundos y el tamaño varía muchísimo según el orden elegido: se hacen muchos y se queda con el más compacto */
+    function planarLayout(n,Ed,D,AW,AH,ms){
+      var t0=performance.now(),best=null,bs=1e18,P,k,x0,x1,y0,y1,sz,tries=0;
+      do{P=planarOnce(n,Ed,D,AW,AH);tries++;if(!P){if(tries===1)return null;continue;}
+        x0=1e18;x1=-1e18;y0=1e18;y1=-1e18;P.forEach(function(p){x0=Math.min(x0,p[0]);x1=Math.max(x1,p[0]);y0=Math.min(y0,p[1]);y1=Math.max(y1,p[1]);});
+        sz=(x1-x0)*(y1-y0)+Math.pow(Math.max(x1-x0,y1-y0),2)*0.3;
+        if(sz<bs){bs=sz;best=P;}
+      }while(performance.now()-t0<(ms||350)&&tries<600);
+      return best;}
+    function countX(P,Ed){var c=0,i,j,a,b;for(i=0;i<Ed.length;i++)for(j=i+1;j<Ed.length;j++){a=Ed[i];b=Ed[j];
+      if(a[0]===b[0]||a[0]===b[1]||a[1]===b[0]||a[1]===b[1])continue;if(segX(P[a[0]],P[a[1]],P[b[0]],P[b[1]]))c++;}return c;}
     function grid(n,Wl,Hl){var B=[R+4,Wl-R-4,R+4,Hl-R-4],cols=Math.max(1,Math.round(Math.sqrt(n*Wl/Hl))),rows=Math.ceil(n/cols),i,P=[];
       for(i=0;i<n;i++)P.push([cols>1?B[0]+(i%cols)*(B[1]-B[0])/(cols-1):(B[0]+B[1])/2,rows>1?B[2]+Math.floor(i/cols)*(B[3]-B[2])/(rows-1):(B[2]+B[3])/2]);
       return P;}
@@ -5223,32 +5471,49 @@ svg.map-on{pointer-events:none}
       var vb=svg.viewBox.baseVal,ex=ext(),aL=RX+20,aR=vb.width-RX-20,aT=RY+20,aB=vb.height-RY-100,AW=aR-aL,AH=aB-aT;
       if(AW<100||AH<100)return;
       var D=2*R+14,s=Math.max(1,Math.sqrt(n*Math.pow(D*1.8,2)/(AW*AH)));
-      var Wl=AW*s,Hl=AH*s,B=[R+4,Wl-R-4,R+4,Hl-R-4],work=null,eng=null,seedP=null,pct=function(){return 0;};
+      var Wl=AW*s,Hl=AH*s,B=[R+4,Wl-R-4,R+4,Hl-R-4],work=null,eng=null,pol=null,seedP=null,pct=function(){return 0;},
+          cats=ids.map(function(q){return cs[q].cat||null;}),planar=null,exTried=false,anch=false;
+      function bb(P){var x0=1e18,x1=-1e18,y0=1e18,y1=-1e18;P.forEach(function(p){x0=Math.min(x0,p[0]);x1=Math.max(x1,p[0]);y0=Math.min(y0,p[1]);y1=Math.max(y1,p[1]);});return [x0,x1,y0,y1];}
+      function startPol(P,ex){var q=bb(P),sz=Math.max(q[1]-q[0],q[3]-q[2]),big=sz>3000;
+        pol=Polisher(P,Ed,D,ex?[q[0]-R,q[1]+R,q[2]-R,q[3]+R]:B,cats,big?Math.min(6000,2500+n*60):Math.min(3000,900+n*60),ex?Math.max(60,Math.min(400,sz/6)):0);}
+      function tryExact(){exTried=true;var X=planarLayout(n,Ed,D,AW,AH);if(!X)return false;startPol(X,true);return true;}   /* respaldo exacto: si la red es plana, SIEMPRE sale sin cruces */
       if(userMoved){
         var P0=ids.map(function(q){return [cs[q].x,cs[q].y];}),x0=1e9,x1=-1e9,y0=1e9,y1=-1e9;
         userMoved=false;                                     /* respeta tu idea; el siguiente Acomodar seguido ya es el normal */
         P0.forEach(function(p){x0=Math.min(x0,p[0]);x1=Math.max(x1,p[0]);y0=Math.min(y0,p[1]);y1=Math.max(y1,p[1]);});
         cost(P0,Ed,D);
         if(VIOL===0){seedP=P0;}
-        else{eng=Engine(P0.map(function(p){return [p[0],p[1]];}),Ed,D,[x0-130,x1+130,y0-130,y1+130],{P0:P0,W:0.25,sig0:60,T0:20,cycles:3,budget:Math.min(15000,3000+n*250+Ed.length*20),minMs:300});}
-      }else if(!Ed.length){seedP=grid(n,Wl,Hl);}
+        else{anch=true;eng=Engine(P0.map(function(p){return [p[0],p[1]];}),Ed,D,[x0-130,x1+130,y0-130,y1+130],{P0:P0,W:0.25,sig0:60,T0:20,cycles:3,budget:Math.min(15000,3000+n*250+Ed.length*20),minMs:300});}
+      }else if(!Ed.length){                                  /* sin relaciones: cuadrícula, con los espacios del mismo tipo juntos */
+        var tn=Object.keys(CATS),rk=function(i){var t=tn.indexOf(cats[i]);return t<0?tn.length:t;},gp=grid(n,Wl,Hl);seedP=[];
+        ids.map(function(q,i){return i;}).sort(function(a,b){return rk(a)-rk(b)||a-b;}).forEach(function(i,g){seedP[i]=gp[g];});}
       else{
         var k=Math.sqrt(Wl*Hl/n)*0.9,nR=Math.max(20,Math.min(120,Math.round(3000/n))),r=0,bestQ=null,bc=1e18;
         work=function(sl){var t0=performance.now(),Q,j,c;
+          if(pol){pol.run(Math.max(2,sl-(performance.now()-t0)));return pol.done();}
+          if(planar===null)planar=!!lrEmbed(n,Ed);            /* ¿se puede sin cruces? (milisegundos) */
           while(!eng){
-            if(r>=nR){eng=Engine(bestQ,Ed,D,B,{sig0:170,T0:40,cycles:5,budget:Math.min(25000,4000+n*350+Ed.length*40),minMs:600});break;}
+            if(r>=nR){eng=Engine(bestQ,Ed,D,B,{sig0:170,T0:40,cycles:planar?3:5,stag:planar?0:Math.max(4000,n*150),budget:planar?Math.min(1800,900+n*25):Math.min(25000,4000+n*350+Ed.length*40),minMs:600});break;}
             Q=[];for(j=0;j<n;j++)Q.push([rnd(B[0],B[1]),rnd(B[2],B[3])]);
             fr(Q,Ed,k,B,Math.min(Wl,Hl)/6);c=cost(Q,Ed,D);if(c<bc){bc=c;bestQ=Q;}r++;
             if(performance.now()-t0>sl)return false;}
-          eng.run(Math.max(2,sl-(performance.now()-t0)));return eng.done();};
-        pct=function(){return eng?0.04+0.96*eng.prog():0.04*r/nR;};
+          eng.run(Math.max(2,sl-(performance.now()-t0)));
+          if(!eng.done())return false;
+          if(eng.viol()===0){startPol(eng.best().map(function(p){return [p[0],p[1]];}),false);return false;}
+          if(planar&&!exTried&&tryExact())return false;     /* el acomodo al azar no lo logró pero la red SÍ es plana: método exacto */
+          return true;};                                      /* red no plana: se queda con el mínimo de cruces */
+        pct=function(){return pol?0.5+0.5*pol.prog():(eng?0.04+0.46*eng.prog():0.04*r/nR);};   /* 0-50 % busca sin cruces, 50-100 % pule */
       }
-      if(eng&&!work){work=function(sl){eng.run(sl);return eng.done();};pct=function(){return eng.prog();};}
-      function result(){var P=seedP||eng.best();return separate(P.map(function(p){return [p[0],p[1]];}),D);}
+      if(eng&&!work){work=function(sl){var t0=performance.now();
+          if(pol){pol.run(Math.max(2,sl-(performance.now()-t0)));return pol.done();}
+          eng.run(sl);if(!eng.done())return false;
+          if(eng.viol()>0&&!exTried&&lrEmbed(n,Ed)&&tryExact())return false;    /* tus movimientos no bastaron: si es plana, se acomoda con el método exacto */
+          return true;};pct=function(){return pol?0.5+0.5*pol.prog():eng.prog()*0.5;};}
+      function result(){var P=seedP||(pol?pol.best():eng.best());return separate(P.map(function(p){return [p[0],p[1]];}),D);}
       function commit(P){
         if(!ids.every(function(q){return cs[q];}))return;      /* mientras calculaba se borró o cargó otro caso */
-        var x0=1e9,x1=-1e9,y0=1e9,y1=-1e9;
-        P.forEach(function(p){x0=Math.min(x0,p[0]);x1=Math.max(x1,p[0]);y0=Math.min(y0,p[1]);y1=Math.max(y1,p[1]);});
+        var x0=1e9,x1=-1e9,y0=1e9,y1=-1e9,vis=ids.map(function(q){return !hid(cs[q]);});if(!vis.some(Boolean))vis=vis.map(function(){return true;});
+        P.forEach(function(p,i){if(!vis[i])return;x0=Math.min(x0,p[0]);x1=Math.max(x1,p[0]);y0=Math.min(y0,p[1]);y1=Math.max(y1,p[1]);});
         var bw=x1-x0+2*R,bh=y1-y0+2*R,kk=Math.max(MINK,Math.min(1,AW/bw,AH/bh));
         var wcx=((aL+aR)/2-ex[0]/2)/kk,wcy=((aT+aB)/2-ex[1]/2)/kk,bcx=(x0+x1)/2,bcy=(y0+y1)/2;
         var st=ids.map(function(q){return [cs[q].x,cs[q].y];}),tg=P.map(function(p){return [p[0]-bcx+wcx,p[1]-bcy+wcy];});
@@ -5261,10 +5526,17 @@ svg.map-on{pointer-events:none}
         function step(now){var f=Math.min(1,(now-t0)/dur);paintAt(f);if(f<1)arrAnim=requestAnimationFrame(step);else{arrAnim=0;arrFin=null;}}
         arrAnim=requestAnimationFrame(step);}
       if(!work){commit(result());return;}
-      var J=job={tm:0,finish:function(){clearTimeout(J.tm);job=null;hideBar();if(eng)eng.stopNow();commit(result());}};
+      var J=job={tm:0,finish:function(){clearTimeout(J.tm);job=null;hideBar();if(eng)eng.stopNow();
+          if(!pol&&eng&&eng.viol()>0&&!exTried&&(planar||(planar===null&&lrEmbed(n,Ed))))tryExact();   /* "terminar ya" antes de lograrlo: se usa el método exacto, que es instantáneo */
+          if(pol)pol.stopNow();
+          var P=result(),nx=countX(P,Ed);
+          if(nx>0&&!anch&&!planar&&window.confirm('Esta red no se puede dibujar sin cruces con líneas rectas (no es plana). El mejor acomodo deja '+nx+' cruce'+(nx>1?'s':'')+'.\n\n¿Quieres que cree un espacio en cada cruce para dejarlo sin cruces?\n\nAceptar: crea los espacios y acomoda de nuevo.\nCancelar: deja el acomodo con los cruces.')){
+            ids.forEach(function(q,i){cs[q].x=P[i][0];cs[q].y=P[i][1];place(cs[q]);});ls.forEach(function(l){lay(l);});
+            planarizeAll();setTimeout(arrange,0);return;}
+          commit(P);}};
       function tick(){if(job!==J)return;
         var done=work(14);
-        showBar('Acomodando: '+Math.round(pct()*100)+'%');
+        showBar((pol?'Puliendo: ':'Acomodando: ')+Math.round(pct()*100)+'%');
         if(done)J.finish();else J.tm=setTimeout(tick,0);}
       showBar('Acomodando: 0%');J.tm=setTimeout(tick,0);}
     window.__dg={
