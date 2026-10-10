@@ -10167,7 +10167,7 @@ svg.map-on{pointer-events:none}
   var KEY={Energyplus:'energyplus',OneBuilding:'onebuilding',Comunidad:'comunidad'};
   var map=null;
   /* ---------- estaciones ----------
-     Datos en estaciones/energyplus.json y estaciones/onebuilding.json (los genera actualizar_estaciones.py).
+     Datos en energyplus.json y onebuilding.json (los genera actualizar_estaciones.py, en la raíz del repo).
      Se buscan junto a este HTML (GitHub Pages / Cloudflare Pages) y, si se abre como archivo local, en el repositorio de GitHub. */
   var REPO='https://raw.githubusercontent.com/Shuiny/Carta-solar/main/';
   /* Proxy CORS opcional (ver proxy_cors_worker.js). Ej.: 'https://mi-proxy.mi-usuario.workers.dev/?u='  — vacío = sin proxy */
@@ -10318,9 +10318,9 @@ svg.map-on{pointer-events:none}
     map.on('movestart',function(){
       clearTimeout(tLargo);});
     var faltan=[];
-    var pe=pedir('estaciones/energyplus.json').then(ponerEnergyplus,function(){
+    var pe=pedir('energyplus.json').then(ponerEnergyplus,function(){
       faltan.push('Energyplus');});
-    var po=pedir('estaciones/onebuilding.json').then(ponerOneBuilding,function(){
+    var po=pedir('onebuilding.json').then(ponerOneBuilding,function(){
       faltan.push('OneBuilding');});
     Promise.all([pe,po]).then(function(){
       var n=layers.energyplus.getLayers().length+layers.onebuilding.getLayers().length;
@@ -10339,9 +10339,9 @@ svg.map-on{pointer-events:none}
       d.est.forEach(function(e){
         var k=distKm(lat,lon,e[1],e[0]);
         if(!mejor||k<mejor.k)mejor={k:k,e:e,d:d,tipo:tipo};});}
-    var pe=pedir('estaciones/energyplus.json').then(function(d){
+    var pe=pedir('energyplus.json').then(function(d){
       probar(d,'ep');},function(){});
-    var po=pedir('estaciones/onebuilding.json').then(function(d){
+    var po=pedir('onebuilding.json').then(function(d){
       probar(d,'ob');},function(){});
     return Promise.all([pe,po]).then(function(){
       return mejor;});}
