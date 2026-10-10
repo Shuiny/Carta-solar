@@ -3664,7 +3664,7 @@ svg.map-on{pointer-events:none}
     /* Créditos: solo aparecen en el SVG y el PNG descargados. Con Vientos encendido salen los dos (Cartasolar.com e Instagram: @Visualle_) en la posición del diseño (Web_1) */
     if(cr){
       cr.removeAttribute('display');
-      if(wOn)cr.setAttribute('x','607');}
+      if(wOn)cr.setAttribute('x','608.03');}
     if(cr2){
       if(wOn)cr2.removeAttribute('display');else cr2.remove();}
     /* sin franjas vacías: se recorta arriba y abajo al contenido, con el mismo margen lateral del diseño (11) */
@@ -7253,7 +7253,7 @@ svg.map-on{pointer-events:none}
   /* etiquetas (N, 22.5°, NE…): se calculan sobre el radio de cada dirección, no con posiciones fijas.
      Cada texto queda centrado en la prolongación de su raya, con la misma separación del círculo (WGAP) en las 16 direcciones;
      los textos de los ejes (N, E, S, O) quedan igual que en el diseño. Tamaño único: 6 px. */
-  var WFS=6,WGAP=7.86;
+  var WFS=6,WGAP=7.86,WLR=7.1,WMIN=1.5;  /* WLR: distancia del círculo al centro de los textos de grados (en el diseño Web_3 miden ≈215 desde el centro, radio del círculo 207.9) */
   function wtw(s){
     var w=0;
     for(var i=0;i<s.length;i++){
@@ -7265,7 +7265,9 @@ svg.map-on{pointer-events:none}
       wgrid.appendChild(el('path',{d:'M'+pol(r.cx,WCY,WRAD,a)+'L'+pol(r.cx,WCY,WRAD,a+180),'class':'eln g sm','data-w':'0.229'}));});
     for(var q=0;q<16;q++){  /* texto = el de siempre (N, 22.5°, NE…) */
       var lab=CARD[q*22.5]!=null?CARD[q*22.5]:num(q*22.5,1)+'°',t=q*22.5*Math.PI/180,ux=Math.sin(t),uy=-Math.cos(t),
-      hw=wtw(lab)/2,hh=WFS*0.365,d=WRAD+WGAP+hw*Math.abs(ux)+hh*Math.abs(uy);  /* distancia del centro del círculo al centro del texto */
+      hw=wtw(lab)/2,hh=WFS*0.365,
+      d=(q%4===0)?WRAD+WGAP+hw*Math.abs(ux)+hh*Math.abs(uy)  /* N, E, S, O: igual que el diseño */
+        :Math.max(WRAD+WLR,WRAD+WMIN+hw*Math.abs(ux)+hh*Math.abs(uy));  /* grados y NE/SE/SO/NO: mismo radio (centro del texto) que los grados del diseño; solo si el texto es tan largo que tocaría el círculo se aleja lo justo (WMIN) */
       var tx=el('text',{x:(r.cx+d*ux).toFixed(2),y:(WCY+d*uy+hh).toFixed(2),'text-anchor':'middle'},lab);
       tx.setAttribute('style','font-family:'+FONT+';font-size:'+WFS+'px;fill:#000;');
       wlab.appendChild(tx);}});
@@ -8105,7 +8107,7 @@ svg.map-on{pointer-events:none}
       out.appendChild(s);}
     out.appendChild(cl);
     /* Cartasolar.com: solo en el archivo descargado, centrado abajo (misma posición que en cada diseño) */
-    var pos=name==='Datos EPW'?[720,vista==='viento'?789.85:821.85]:[135,854.85];
+    var pos=name==='Datos EPW'?[721.16,vista==='viento'?797.85:829.85]:[135,854.85];  /* Datos EPW: misma posición que Web_2 / Web_3 (línea base a 20.85 bajo las pastillas, centro 721.16 con Inter) */
     var cr=el('text',{x:pos[0],y:pos[1],'text-anchor':'middle'},out);
     cr.setAttribute('style',"font-family:"+(name==='Datos EPW'?"'Inter EPW',":'')+"'Inter-Regular','Inter',Arial,sans-serif;font-size:12px;font-weight:400;fill:#000;");
     cr.textContent='Cartasolar.com';
