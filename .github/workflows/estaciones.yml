@@ -1,0 +1,25 @@
+name: Actualizar estaciones EPW
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 6 1 * *'
+
+permissions:
+  contents: write
+
+jobs:
+  estaciones:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Generar los JSON de estaciones
+        run: python3 actualizar_estaciones.py --todo
+      - name: Guardar cambios
+        run: |
+          git config user.name  "github-actions"
+          git config user.email "github-actions@users.noreply.github.com"
+          git add onebuilding.json energyplus.json
+          git diff --cached --quiet || git commit -m "Actualizar estaciones EPW"
+          git push
