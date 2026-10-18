@@ -15,7 +15,7 @@ concurrency:
 jobs:
   estaciones:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
       - name: Generar los JSON de estaciones
@@ -24,7 +24,7 @@ jobs:
         run: |
           git config user.name  "github-actions"
           git config user.email "github-actions@users.noreply.github.com"
-          git add onebuilding.json energyplus.json
+          git add onebuilding.json energyplus.json cabeceras.json
           if git diff --cached --quiet; then
             echo "Sin cambios"
             exit 0
