@@ -3,10 +3,14 @@ name: Actualizar estaciones EPW
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0 6 1 * *'
+    - cron: '0 6 1 * *'   # Corre a las 06:00 UTC, el día 1 de cada mes
 
 permissions:
   contents: write
+
+concurrency:
+  group: estaciones-epw
+  cancel-in-progress: false
 
 jobs:
   estaciones:
@@ -21,5 +25,10 @@ jobs:
           git config user.name  "github-actions"
           git config user.email "github-actions@users.noreply.github.com"
           git add onebuilding.json energyplus.json
-          git diff --cached --quiet || git commit -m "Actualizar estaciones EPW"
+          if git diff --cached --quiet; then
+            echo "Sin cambios"
+            exit 0
+          fi
+          git commit -m "Actualizar estaciones EPW"
+          git pull --rebase origin main
           git push
