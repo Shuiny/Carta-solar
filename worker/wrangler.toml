@@ -1,0 +1,34 @@
+# Worker único de cartasolar.com (proxy de EPW + estaciones de la comunidad).
+# Se despliega con:  ./desplegar.sh   (o  npx wrangler deploy  si ya está configurado)
+name = "cartasolar-api"
+main = "src/index.js"
+compatibility_date = "2026-10-01"
+workers_dev = true
+preview_urls = false
+
+# Registros: quédate solo con lo necesario.
+[observability]
+enabled = true
+head_sampling_rate = 0.1
+
+# Estaciones de la comunidad. desplegar.sh pone el id al crearlo.
+[[kv_namespaces]]
+binding = "DATOS"
+id = "561d794d1c9e4acb933feabb8d075064"
+
+# Límites por IP (gratis, sin escribir en KV).
+[[ratelimits]]
+name = "LIMITE_PROXY"
+namespace_id = "1001"
+  [ratelimits.simple]
+  limit = 60
+  period = 60
+
+[[ratelimits]]
+name = "LIMITE_SUBIR"
+namespace_id = "1002"
+  [ratelimits.simple]
+  limit = 3
+  period = 60
+
+# La clave de administración NO va aquí: es un secreto (npx wrangler secret put CLAVE).

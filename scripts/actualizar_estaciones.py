@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 """
-Genera onebuilding.json (y con --todo también energyplus.json) para el mapa de "Buscar archivo EPW".
+Genera datos/onebuilding.json (y con --todo también datos/energyplus.json) para el mapa de "Buscar archivo EPW".
 
-Uso:   python3 actualizar_estaciones.py            # solo OneBuilding
-       python3 actualizar_estaciones.py --todo     # OneBuilding + Energyplus.net
+Uso (desde la raíz del repo):
+       python3 scripts/actualizar_estaciones.py            # solo OneBuilding
+       python3 scripts/actualizar_estaciones.py --todo     # OneBuilding + Energyplus.net
 
 Opciones para las coordenadas por versión (ver leer_cabeceras):
        --cabeceras=MEX_Mexico/    # solo lee los EPW de las estaciones cuya ruta contenga este texto (defecto)
@@ -24,7 +25,8 @@ KMLS = ['Region1_Africa', 'Region2_Asia', 'Region2_Region6_Russia', 'Region3_Sou
         'Region4_USA', 'Region4_Canada', 'Region4_NA_CA_Caribbean', 'Region5_Southwest_Pacific',
         'Region6_Europe', 'Region7_Antarctica']
 KML_SUFFIX = '_TMYx_EPW_Processing_locations.kml'
-OUT = os.path.dirname(os.path.abspath(__file__))   # los JSON van en la raíz del repo
+AQUI = os.path.dirname(os.path.abspath(__file__))           # scripts/
+DATOS = os.path.join(os.path.dirname(AQUI), 'datos')        # los JSON del mapa van en datos/
 
 
 def get(url):
@@ -35,7 +37,7 @@ def get(url):
 
 UA = 'cartasolar-estaciones/1.0'
 UMBRAL = 0.01          # grados (~1 km): dos versiones más lejos que esto se dibujan como puntos distintos
-CACHE = 'cabeceras.json'
+CACHE = os.path.join(AQUI, 'cabeceras.json')   # caché del script (no la usa la página)
 
 
 def pedir(url, rango=None):
@@ -125,11 +127,10 @@ def opcion(nombre, defecto):
 def leer_cabeceras(acum, filtro, presupuesto):
     """OneBuilding declara una sola ubicación por estación en el KML, pero cada versión (2004-2018, 2009-2023,
     2011-2025...) puede traer otra en la línea LOCATION de su EPW (las nuevas, con ERA5, a veces cambian el punto).
-    Aquí se lee esa línea y se corrige la coordenada de cada versión. Los resultados se guardan en cabeceras.json
-    para no volver a bajar nada en las siguientes corridas."""
-    ruta = os.path.join(OUT, CACHE)
+    Aquí se lee esa línea y se corrige la coordenada de cada versión. Los resultados se guardan en
+    scripts/cabeceras.json para no volver a bajar nada en las siguientes corridas."""
     try:
-        cache = json.load(open(ruta, encoding='utf-8'))
+        cache = json.load(open(CACHE, encoding='utf-8'))
     except Exception:
         cache = {}
     tareas = [(b, v) for b, e in acum.items() if filtro in b for v in sorted(e[3], key=orden_variante)
@@ -150,7 +151,7 @@ def leer_cabeceras(acum, filtro, presupuesto):
                 hechas += 1
     print('  cabeceras leídas:', hechas, '| pendientes para la siguiente corrida:', len(tareas) - hechas)
     if hechas:
-        guardar(CACHE, cache)
+        escribir(CACHE, cache)
     for b, e in acum.items():
         for v in e[3]:
             c = cache.get(b + v)
@@ -229,8 +230,26 @@ def onebuilding():
         leer_cabeceras(acum, opcion('--cabeceras', 'MEX_Mexico/'), float(opcion('--presupuesto', 600)))
     est = [agrupar(e) for e in acum.values()]
     est.sort(key=lambda e: (e[1], e[0]))
-    guardar('onebuilding.json', {'v': 1, 'fuente': 'climate.onebuilding.org (TMYx)', 'base': OB, 'est': est})
+    guardar('onebuilding.json', compactar(est, {'fuente': 'climate.onebuilding.org (TMYx)', 'base': OB}))
     print('OneBuilding:', len(est), 'estaciones')
+
+
+def compactar(est, cabecera):
+    """Formato v2 (≈60 % más ligero que el v1): las carpetas y las listas de versiones se guardan una sola vez.
+       dirs: ["WMO_Region_4_.../MEX_Mexico/BCS_Baja_California_Sur", ...]
+       vars: [[".2011-2025", ".2009-2023", ...], ...]
+       est:  [lon, lat, i_dir, nombre, i_vars, (extras)] ; extras = [[lon, lat, i_vars], ...]
+    La página reconstruye la ruta como dirs[i_dir] + "/" + nombre."""
+    dirs, vs, out = {}, {}, []
+    def iv(v):
+        return vs.setdefault(json.dumps(v), len(vs))
+    for e in est:
+        carpeta, _, nombre = e[2].rpartition('/')
+        fila = [e[0], e[1], dirs.setdefault(carpeta, len(dirs)), nombre, iv(e[3])]
+        if len(e) > 4:
+            fila.append([[x[0], x[1], iv(x[2])] for x in e[4]])
+        out.append(fila)
+    return dict({'v': 2}, **cabecera, dirs=list(dirs), vars=[json.loads(k) for k in vs], est=out)
 
 
 def energyplus():
@@ -248,9 +267,14 @@ def energyplus():
     print('Energyplus:', len(est), 'estaciones')
 
 
-def guardar(nombre, datos):
-    with open(os.path.join(OUT, nombre), 'w', encoding='utf-8') as f:
+def escribir(ruta, datos):
+    with open(ruta, 'w', encoding='utf-8') as f:
         json.dump(datos, f, separators=(',', ':'), ensure_ascii=False)
+
+
+def guardar(nombre, datos):
+    os.makedirs(DATOS, exist_ok=True)
+    escribir(os.path.join(DATOS, nombre), datos)
 
 
 if __name__ == '__main__':
